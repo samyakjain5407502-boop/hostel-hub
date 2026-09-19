@@ -1,0 +1,528 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   HostelHub design tokens
+   Single source of truth for both light and dark palettes.
+   Components reference semantic tokens (--hi-*, --card-*,
+   --border-*, --muted-*, --accent-*) so a single .dark block
+   flips the entire UI.
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --brand: #6366f1;
+  --brand-50: #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-200: #c7d2fe;
+  --brand-300: #a5b4fc;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
+  --brand-700: #4338ca;
+  --brand-800: #3730a3;
+  --brand-900: #312e81;
+  --brand-950: #1e1b4b;
+
+  /* High-surface tokens */
+  --bg: #f8fafc;
+  --bg-elevated: #ffffff;
+  --fg: #0f172a;
+  --fg-muted: #475569;
+  --fg-subtle: #94a3b8;
+
+  /* Card / panel */
+  --card: #ffffff;
+  --card-2: #f1f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  /* Muted / subtle surfaces */
+  --muted: #f1f5f9;
+  --muted-2: #e2e8f0;
+  --muted-fg: #64748b;
+
+  /* Accent (actions, focus, highlights) */
+  --accent: #6366f1;
+  --accent-soft: #eef2ff;
+  --accent-fg: #4338ca;
+
+  /* Status */
+  --success: #10b981;
+  --success-soft: #d1fae5;
+  --success-fg: #065f46;
+  --amber: #f59e0b;
+  --amber-soft: #fef3c7;
+  --amber-fg: #92400e;
+  --rose: #f43f5e;
+  --rose-soft: #ffe4e6;
+  --rose-fg: #9f1239;
+  --sky: #0ea5e9;
+  --sky-soft: #e0f2fe;
+  --sky-fg: #075985;
+  --violet: #8b5cf6;
+  --violet-soft: #ede9fe;
+  --violet-fg: #5b21b6;
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(99, 102, 241, 0.14);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --brand: #818cf8;
+  --brand-50: #1e1b4b;
+  --brand-100: #312e81;
+  --brand-200: #3730a3;
+  --brand-300: #4338ca;
+  --brand-400: #4f46e5;
+  --brand-500: #6366f1;
+  --brand-600: #818cf8;
+  --brand-700: #a5b4fc;
+  --brand-800: #c7d2fe;
+  --brand-900: #e0e7ff;
+  --brand-950: #eef2ff;
+
+  --bg: #0b1120;
+  --bg-elevated: #111827;
+  --fg: #f1f5f9;
+  --fg-muted: #94a3b8;
+  --fg-subtle: #64748b;
+
+  --card: #111827;
+  --card-2: #1a1f2e;
+  --border: #1e293b;
+  --border-strong: #334155;
+
+  --muted: #111827;
+  --muted-2: #1a1f2e;
+  --muted-fg: #94a3b8;
+
+  --accent: #818cf8;
+  --accent-soft: rgba(99, 102, 241, 0.15);
+  --accent-fg: #a5b4fc;
+
+  --success: #34d399;
+  --success-soft: rgba(16, 185, 129, 0.15);
+  --success-fg: #6ee7b7;
+  --amber: #fbbf24;
+  --amber-soft: rgba(245, 158, 11, 0.15);
+  --amber-fg: #fcd34d;
+  --rose: #fb7185;
+  --rose-soft: rgba(244, 63, 94, 0.15);
+  --rose-fg: #fda4af;
+  --sky: #38bdf8;
+  --sky-soft: rgba(14, 165, 233, 0.15);
+  --sky-fg: #7dd3fc;
+  --violet: #a78bfa;
+  --violet-soft: rgba(139, 92, 246, 0.15);
+  --violet-fg: #c4b5fd;
+
+  --glass-bg: rgba(17, 24, 39, 0.72);
+  --glass-border: rgba(129, 140, 248, 0.18);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  @apply antialiased;
+  font-feature-settings: 'cv02', 'cv03', 'cv04';
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Smooth transitions on themed containers */
+.card,
+.rounded-2xl,
+.rounded-xl,
+.rounded-lg,
+button,
+input,
+textarea,
+select,
+table,
+th,
+td {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ---------- Glass header ---------- */
+.glass-header {
+  background: linear-gradient(180deg, var(--glass-bg) 0%, rgba(255, 255, 255, 0.55) 100%);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04), 0 12px 40px -18px rgba(79, 70, 229, 0.18);
+}
+
+.dark .glass-header {
+  background: linear-gradient(180deg, rgba(2, 3, 16, 0.9) 0%, rgba(17, 24, 39, 0.75) 100%);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 12px 40px -18px rgba(0, 0, 0, 0.55);
+}
+
+/* ---------- Glass card ---------- */
+.card-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+}
+
+/* ---------- Floating pulse for interactive cards ---------- */
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.card-float:hover { animation: float 3s ease-in-out infinite; }
+
+/* ---------- Mesh gradient backdrop (landing) ---------- */
+.mesh-bg {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(99, 102, 241, 0.16) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 55% 88%, rgba(139, 92, 246, 0.12) 0%, transparent 44%),
+    linear-gradient(180deg, #f8fafc 0%, #f3f4f6 55%, #eef2ff 100%);
+}
+
+.dark .mesh-bg {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(129, 140, 248, 0.14) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(52, 211, 153, 0.10) 0%, transparent 40%),
+    radial-gradient(circle at 55% 88%, rgba(167, 139, 250, 0.10) 0%, transparent 44%),
+    linear-gradient(180deg, #020310 0%, #060b18 55%, #0f172a 100%);
+}
+
+/* ---------- Scrollbar ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.45) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgba(129, 140, 248, 0.45) rgba(15, 23, 42, 0.6);
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 9999px;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: rgba(129, 140, 248, 0.4);
+}
+
+/* ---------- Text selection ---------- */
+::selection {
+  background: var(--brand-200);
+  color: var(--brand-900);
+}
+
+.dark ::selection {
+  background: rgba(129, 140, 248, 0.35);
+  color: #eef2ff;
+}
+
+/* ---------- Focus ring for a11y ---------- */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ---------- Shimmer on skeleton ---------- */
+.shimmer {
+  background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%);
+  background-size: 240% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(90deg, #1e293b 0%, #111827 50%, #1e293b 100%);
+  background-size: 240% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 0; }
+  100% { background-position: -120% 0; }
+}
+
+/* ---------- Utility: hide scrollbars ---------- */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   Dark-mode helper classes
+   Used alongside Tailwind's `dark:` variant so we get the best
+   of both: Tailwind for component overrides, CSS vars for global
+   surfaces.
+   ============================================================ */
+
+.theme-surface {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+.theme-card {
+  background-color: var(--card);
+  border-color: var(--border);
+}
+
+.theme-muted {
+  background-color: var(--muted);
+  color: var(--muted-fg);
+}
+
+.theme-border {
+  border-color: var(--border);
+}
+
+.text-muted {
+  color: var(--fg-muted);
+}
+
+.text-subtle {
+  color: var(--fg-subtle);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.text-success {
+  color: var(--success);
+}
+
+.text-amber {
+  color: var(--amber);
+}
+
+.text-rose {
+  color: var(--rose);
+}
+
+.text-sky {
+  color: var(--sky);
+}
+
+.bg-accent-soft {
+  background-color: var(--accent-soft);
+}
+
+.bg-success-soft {
+  background-color: var(--success-soft);
+}
+
+.bg-amber-soft {
+  background-color: var(--amber-soft);
+}
+
+.bg-rose-soft {
+  background-color: var(--rose-soft);
+}
+
+.bg-sky-soft {
+  background-color: var(--sky-soft);
+}
+
+.bg-violet-soft {
+  background-color: var(--violet-soft);
+}
+
+/* ============================================================
+   Dark-mode palette remap
+   ------------------------------------------------------------
+   Most components were written with light-mode palette utilities
+   (bg-white, text-slate-900, hover:* …). Instead of touching
+   every call site we re-point those exact utility classes to
+   dark-appropriate values whenever <html> has `.dark`.
+
+   Rules for staying safe:
+   • Plain rules are scoped with `:where(.dark)` (zero specificity) so an
+     explicit Tailwind `dark:` variant on an element always wins; the
+     interactive-state block below uses a real `.dark` scope because Tailwind
+     emits variant utilities after this file (see the note there).
+   • Only light-on-dark *and* dark-on-light pairs are remapped, and
+     never on the same property: dark shades always move to the
+     text ramp, light shades always move to the surface ramp, so
+     "dark text on a dark surface" can never happen.
+   • `bg-slate-900`/`bg-slate-800`, gradients and `text-white` are
+     intentionally left alone — they are dark surfaces in both
+     themes (buttons, gate-pass chips, image overlays).
+   ============================================================ */
+
+/* ---------- Text ramp (dark text → light text) ---------- */
+:where(.dark) .text-slate-900 { color: #f8fafc; } /* was #0f172a */
+:where(.dark) .text-slate-800 { color: #e2e8f0; } /* was #1e293b */
+:where(.dark) .text-slate-700 { color: #cbd5e1; } /* was #334155 */
+:where(.dark) .text-slate-600 { color: #aab8c8; } /* was #475569 */
+:where(.dark) .text-slate-500 { color: #94a3b8; } /* was #64748b */
+:where(.dark) .text-slate-400 { color: #7d8ba0; } /* was #94a3b8 */
+:where(.dark) .text-slate-300 { color: #475569; } /* was #cbd5e1 */
+
+/* ---------- Surface ramp (light surfaces → dark surfaces) ---------- */
+:where(.dark) .bg-white { background-color: var(--card); }
+:where(.dark) .bg-white\/95 { background-color: rgba(17, 24, 39, 0.95); }
+:where(.dark) .bg-white\/80 { background-color: rgba(17, 24, 39, 0.8); }
+:where(.dark) .bg-white\/70 { background-color: rgba(17, 24, 39, 0.7); }
+:where(.dark) .bg-white\/60 { background-color: rgba(17, 24, 39, 0.6); }
+:where(.dark) .bg-slate-50 { background-color: var(--card-2); }
+:where(.dark) .bg-slate-50\/60 { background-color: rgba(26, 31, 46, 0.6); }
+:where(.dark) .bg-slate-100 { background-color: #1e293b; } /* chips, tracks */
+:where(.dark) .bg-slate-200 { background-color: #334155; }
+
+/* ---------- Borders & dividers ---------- */
+:where(.dark) .border-slate-100 { border-color: rgba(148, 163, 184, 0.12); }
+:where(.dark) .border-slate-200 { border-color: var(--border); }
+:where(.dark) .border-slate-300 { border-color: var(--border-strong); }
+:where(.dark) .divide-slate-100 { border-color: rgba(148, 163, 184, 0.12); }
+
+/* Bare `border` / `divide-y` separators have no colour class, so they would
+   keep Tailwind's light default (#e5e7eb) on a dark surface. Zero specificity
+   means every explicit border-* utility still wins over this fallback. */
+:where(.dark) *,
+:where(.dark) ::before,
+:where(.dark) ::after {
+  border-color: var(--border);
+}
+
+/* ---------- Brand accents (flipped by the --brand-* tokens) ---------- */
+:where(.dark) .bg-brand-50 { background-color: var(--brand-50); }   /* #1e1b4b */
+:where(.dark) .bg-brand-100 { background-color: var(--brand-100); } /* #312e81 */
+:where(.dark) .text-brand-500 { color: var(--brand); }              /* #818cf8 */
+:where(.dark) .text-brand-600 { color: var(--brand-600); }          /* #818cf8 */
+:where(.dark) .text-brand-700 { color: var(--brand-700); }          /* #a5b4fc */
+:where(.dark) .text-brand-800 { color: var(--brand-800); }          /* #c7d2fe */
+:where(.dark) .border-brand-200 { border-color: var(--brand-200); }
+:where(.dark) .border-brand-300 { border-color: var(--brand-300); }
+:where(.dark) .border-brand-400 { border-color: var(--brand-400); }
+:where(.dark) .ring-brand-100 { --tw-ring-color: rgba(129, 140, 248, 0.2); }
+
+/* ---------- Status tones (tinted surfaces + lighter text) ---------- */
+:where(.dark) .bg-success-50,
+:where(.dark) .bg-success-100 { background-color: var(--success-soft); }
+:where(.dark) .bg-amber-50,
+:where(.dark) .bg-amber-100 { background-color: var(--amber-soft); }
+:where(.dark) .bg-amber-50\/60 { background-color: rgba(245, 158, 11, 0.18); }
+:where(.dark) .bg-rose-50,
+:where(.dark) .bg-rose-100 { background-color: var(--rose-soft); }
+:where(.dark) .bg-rose-50\/40 { background-color: rgba(244, 63, 94, 0.1); }
+:where(.dark) .bg-sky-50,
+:where(.dark) .bg-sky-100 { background-color: var(--sky-soft); }
+:where(.dark) .bg-violet-50,
+:where(.dark) .bg-violet-100 { background-color: var(--violet-soft); }
+
+:where(.dark) .text-success-500 { color: var(--success); }       /* #34d399 */
+:where(.dark) .text-success-600,
+:where(.dark) .text-success-700,
+:where(.dark) .text-success-800,
+:where(.dark) .text-success-900 { color: var(--success-fg); }    /* #6ee7b7 */
+:where(.dark) .text-amber-600,
+:where(.dark) .text-amber-700,
+:where(.dark) .text-amber-900 { color: var(--amber-fg); }        /* #fcd34d */
+:where(.dark) .text-rose-500 { color: var(--rose); }             /* #fb7185 */
+:where(.dark) .text-rose-600,
+:where(.dark) .text-rose-700,
+:where(.dark) .text-rose-900 { color: var(--rose-fg); }          /* #fda4af */
+:where(.dark) .text-sky-600,
+:where(.dark) .text-sky-700 { color: var(--sky-fg); }            /* #7dd3fc */
+:where(.dark) .text-violet-500 { color: var(--violet); }         /* #a78bfa */
+:where(.dark) .text-violet-600,
+:where(.dark) .text-violet-700 { color: var(--violet-fg); }       /* #c4b5fd */
+:where(.dark) .text-emerald-700 { color: var(--success-fg); }
+
+:where(.dark) .border-success-200,
+:where(.dark) .border-success-300 { border-color: rgba(52, 211, 153, 0.4); }
+:where(.dark) .border-amber-200,
+:where(.dark) .border-amber-300 { border-color: rgba(251, 191, 36, 0.4); }
+:where(.dark) .border-rose-200,
+:where(.dark) .border-rose-300 { border-color: rgba(251, 113, 133, 0.4); }
+
+/* ---------- Interactive states ----------
+   These need a real `.dark` scope instead of `:where(.dark)`: Tailwind emits
+   variant utilities (`hover:`, `focus:`, `disabled:`, `data-*`, `::placeholder`)
+   *after* this stylesheet, so a specificity tie would fall back to the light
+   value. An explicit `dark:hover:*` variant still wins because Tailwind emits
+   those even later. */
+.dark .hover\:bg-white:hover { background-color: var(--card-2); }
+.dark .hover\:bg-slate-50:hover { background-color: var(--card-2); }
+.dark .hover\:bg-slate-100:hover { background-color: #1e293b; }
+.dark .hover\:bg-slate-200:hover { background-color: #334155; }
+.dark .hover\:bg-brand-50:hover { background-color: var(--brand-50); }
+.dark .hover\:bg-brand-100:hover { background-color: var(--brand-100); }
+.dark .hover\:bg-amber-50:hover { background-color: var(--amber-soft); }
+.dark .hover\:text-brand-600:hover { color: var(--brand-600); }
+.dark .hover\:text-brand-700:hover { color: var(--brand-700); }
+.dark .hover\:text-slate-700:hover { color: #cbd5e1; }
+.dark .hover\:text-slate-800:hover { color: #e2e8f0; }
+.dark .hover\:border-brand-300:hover { border-color: var(--brand-300); }
+.dark .hover\:border-brand-400:hover { border-color: var(--brand-400); }
+.dark .focus\:ring-brand-100:focus { --tw-ring-color: rgba(129, 140, 248, 0.2); }
+.dark .disabled\:bg-slate-50:disabled { background-color: var(--card-2); }
+.dark .disabled\:text-slate-400:disabled { color: #7d8ba0; }
+.dark .placeholder\:text-slate-400::placeholder { color: #7d8ba0; }
+.dark .placeholder\:text-slate-300::placeholder { color: #475569; }
+.dark .data-\[highlighted\]\:bg-brand-50[data-highlighted] { background-color: var(--brand-50); }
+.dark .data-\[highlighted\]\:text-brand-800[data-highlighted] { color: var(--brand-800); }
+.dark .data-\[highlighted\]\:bg-rose-50[data-highlighted] { background-color: var(--rose-soft); }
+
+/* ---------- Gradient stops that start from a light tint ---------- */
+:where(.dark) .from-amber-50 {
+  --tw-gradient-from: rgba(245, 158, 11, 0.14) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgba(245, 158, 11, 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+:where(.dark) .to-white {
+  --tw-gradient-to: var(--card) var(--tw-gradient-to-position);
+}
+
+/* ============================================================
+   Always-light surfaces
+   Components that must stay on a light background in both themes
+   (scannable/photo-like visuals) use explicit classes instead of
+   the palette utilities, so the remap above never touches them.
+   ============================================================ */
+
+.passcode-surface {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.passcode-cell-on {
+  background-color: #0f172a;
+}
+
+.passcode-cell-off {
+  background-color: #f1f5f9;
+}

@@ -1,0 +1,25 @@
+
+> hostelhub@1.0.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 23.8s
+ ○ Compiling / ...
+ ✓ Compiled / in 21.6s (1465 modules)
+ GET / 200 in 22977ms
+ GET / 200 in 23004ms
+ ○ Compiling /hostels ...
+ ✓ Compiled /hostels in 24.4s (1489 modules)
+ GET / 200 in 3264ms
+ GET /hostels 200 in 153ms
+ GET / 200 in 879ms
+ ○ Compiling /src/middleware ...
+ ✓ Compiled /src/middleware in 1008ms (73 modules)
+ ○ Compiling /auth/student ...
+ ✓ Compiled /auth/student in 2.8s (1496 modules)
+ GET /auth/student 200 in 4215ms
+ ✓ Compiled in 2.2s (1510 modules)
+ ✓ Compiled in 866ms (1510 modules)

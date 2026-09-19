@@ -1,0 +1,91 @@
+// HostelHub · Prisma schema (alternative to Supabase).
+// Wire your DATABASE_URL in .env.local to migrate: `npx prisma migrate dev`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role { student admin }
+enum Slot { breakfast lunch snacks dinner }
+enum Priority { Urgent Normal }
+enum ComplaintStatus { Submitted In_Review Technician_Assigned Resolved Closed }
+
+model Profile {
+  id        String   @id @default(cuid())
+  role      Role
+  name      String
+  studentId String?  @unique
+  email     String?  @unique
+  complaints Complaint[]
+  rewards   Reward[]
+  optedMeals MealOptIn[]
+  wallet    Wallet?
+}
+
+model MealPlan {
+  id     String @id @default(cuid())
+  date   DateTime
+  slot   Slot
+  label  String
+  time   String?
+  credits Int   @default(10)
+  status String @default("upcoming")
+  items  Json
+  optIns MealOptIn[]
+  @@unique([date, slot])
+}
+
+model MealOptIn {
+  id        String @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String
+  mealPlan  MealPlan @relation(fields: [mealPlanId], references: [id])
+  mealPlanId String
+  choice    String
+  @@unique([profileId, mealPlanId])
+}
+
+model Wallet {
+  id         String @id @default(cuid())
+  profile    Profile @relation(fields: [profileId], references: [id])
+  profileId  String @unique
+  allocation Int    @default(120)
+  used       Int    @default(0)
+  onMeal     Int    @default(0)
+  redeemed   Int    @default(0)
+}
+
+model Reward {
+  id        String @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String
+  kind      String
+  points    Int
+  label     String
+  meta      String?
+  createdAt DateTime @default(now())
+}
+
+model Complaint {
+  id          String @id @default(cuid())
+  ticketNo    String @unique
+  author      Profile? @relation(fields: [authorId], references: [id])
+  authorId    String?
+  category    String
+  title       String
+  description String?
+  priority    Priority
+  status      ComplaintStatus @default(Submitted)
+  photoUrl    String?
+  assignee    String?
+  feedback    String?
+  slaSeconds  Int?
+  votes       Int    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
