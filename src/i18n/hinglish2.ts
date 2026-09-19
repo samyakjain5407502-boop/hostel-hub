@@ -44,6 +44,8 @@ export const hinglish2 = {
   'auth.student.title': 'Student Portal',
   'auth.student.sub': 'Mess, complaint aur rewards ke liye registered hostel credentials se sign in karo.',
     'auth.student.id': 'Student ID / Registered Email',
+  'auth.student.college': 'Select College',
+  'auth.student.collegeRequired': 'Aage badhne ke liye apna college select karo.',
   'auth.student.mobile': 'Mobile number',
   'auth.student.password': 'Password',
   'auth.student.otp': 'One-Time Password',

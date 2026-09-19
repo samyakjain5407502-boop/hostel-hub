@@ -44,6 +44,8 @@ export const en2 = {
   'auth.student.title': 'Student Portal',
   'auth.student.sub': 'Sign in with your registered hostel credentials to manage mess, complaints & rewards.',
     'auth.student.id': 'Student ID / Registered Email',
+  'auth.student.college': 'Select College',
+  'auth.student.collegeRequired': 'Select your college to continue.',
   'auth.student.mobile': 'Mobile number',
   'auth.student.password': 'Password',
   'auth.student.otp': 'One-Time Password',

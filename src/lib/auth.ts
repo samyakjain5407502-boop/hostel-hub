@@ -1,4 +1,4 @@
-import type { Role, Session, User } from '@/types';
+import type { College, Role, Session, User } from '@/types';
 
 /**
  * Lightweight JWT-style session tokens (HS256) built on WebCrypto.
@@ -41,6 +41,7 @@ export async function issueSession(user: User): Promise<Session> {
   const header = b64u.encode(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const payload = b64u.encode(JSON.stringify({
     sub: user.id, role: user.role, name: user.name, studentId: user.studentId,
+    collegeId: user.collegeId, collegeName: user.collegeName, mobile: user.mobile,
     iat: now, exp: now + LIFETIME
   }));
   const token = `${header}.${payload}.${await sign(`${header}.${payload}`)}`;
@@ -58,7 +59,10 @@ export async function verifySession(token: string | undefined | null): Promise<S
   try {
     const data = JSON.parse(b64u.decode(payload));
     if (!data || !data.exp || data.exp < Math.floor(Date.now() / 1000)) return null;
-    const user: User = { id: data.sub, name: data.name, role: data.role as Role, studentId: data.studentId };
+    const user: User = {
+      id: data.sub, name: data.name, role: data.role as Role, studentId: data.studentId,
+      collegeId: data.collegeId, collegeName: data.collegeName, mobile: data.mobile
+    };
     return { token, role: user.role, user, iat: data.iat, exp: data.exp };
   } catch {
     return null;
@@ -75,8 +79,17 @@ export { COOKIE };
 export const DEMO_STUDENT = { id: 'STU-23045', password: 'hostelhub' };
 export const DEMO_ADMIN = { id: 'FAC-1001', key: 'HUB-2026', passkey: '447102' };
 
-export function demoStudentUser(): User {
-  return { id: DEMO_STUDENT.id, name: 'Aarav Mehta', role: 'student', studentId: DEMO_STUDENT.id, avatarHue: 248 };
+export function demoStudentUser(college?: College | null, mobile?: string): User {
+  return {
+    id: DEMO_STUDENT.id,
+    name: 'Aarav Mehta',
+    role: 'student',
+    studentId: DEMO_STUDENT.id,
+    collegeId: college?.id,
+    collegeName: college?.name,
+    mobile,
+    avatarHue: 248
+  };
 }
 export function demoAdminUser(): User {
     return { id: DEMO_ADMIN.id, name: 'Admin User', role: 'admin', email: 'admin@hostelhub.app', avatarHue: 160 };

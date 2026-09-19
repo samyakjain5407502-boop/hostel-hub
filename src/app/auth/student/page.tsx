@@ -1,15 +1,17 @@
 'use client';
 
-import { GraduationCap, Mail, Lock, KeyRound, RefreshCw, ShieldAlert, Smartphone } from 'lucide-react';
+import { Building2, GraduationCap, Mail, Lock, KeyRound, RefreshCw, ShieldAlert, Smartphone } from 'lucide-react';
 import * as React from 'react';
 import { AuthShell, Spin } from '@/components/auth/shell';
 import { Field } from '@/components/auth/field';
 import { OtpBanner } from '@/components/auth/otp-banner';
+import { CollegeSelect } from '@/components/auth/college-select';
 import { Button } from '@/components/ui/button';
 import { inputBase } from '@/components/ui/field';
 import { useLang, type TKey } from '@/i18n';
 import { DEMO_STUDENT, demoStudentUser } from '@/lib/auth';
 import { clientLogin } from '@/lib/client-session';
+import type { College } from '@/types';
 import { isMockMode } from '@/lib/data-mode';
 import {
   attemptsLeft, createOtpChallenge, deliverOtp, isValidMobile, maskMobile, normalizeMobile,
@@ -32,6 +34,9 @@ export default function StudentAuthPage() {
     const [id, setId] = React.useState('STU-23045');
   const [pw, setPw] = React.useState('');
   const [mobile, setMobile] = React.useState('');
+  /** Selected college — required, travels with the login request. */
+  const [college, setCollege] = React.useState<College | null>(null);
+  const [collegeError, setCollegeError] = React.useState(false);
   const [otp, setOtp] = React.useState('');
   /** The one live challenge for this session — it owns the freshly minted code. */
   const [challenge, setChallenge] = React.useState<OtpChallenge | null>(null);
@@ -109,10 +114,18 @@ export default function StudentAuthPage() {
     setBusy(true);
     try {
       if (demo) {
-        await clientLogin(demoStudentUser());
+        await clientLogin(demoStudentUser(college));
         window.location.href = '/dashboard';
         return;
       }
+
+      /* The college field is required — validated before the credentials. */
+      if (!college) {
+        setCollegeError(true);
+        toast.push({ title: t('auth.student.collegeRequired'), tone: 'warning' });
+        return;
+      }
+      setCollegeError(false);
 
       const cleanId = id.trim().toUpperCase();
       const cleanPw = pw.trim();
@@ -150,7 +163,19 @@ export default function StudentAuthPage() {
         return;
       }
 
-      await clientLogin(demoStudentUser());
+      /* The login request carries the selected college alongside the
+         other credentials (Student ID, password, mobile). When this demo
+         is wired to a real backend, POST this object to the auth endpoint. */
+      const loginRequest = {
+        collegeId: college.id,
+        collegeName: college.name,
+        studentId: cleanId,
+        password: cleanPw,
+        mobile: normalizeMobile(mobile)
+      };
+      console.info('[hostelhub] student login request', { ...loginRequest, password: '••••••' });
+
+      await clientLogin(demoStudentUser(college, loginRequest.mobile));
       window.location.href = '/dashboard';
     } catch {
       toast.push({ title: t('auth.error.invalid'), tone: 'warning' });
@@ -181,6 +206,22 @@ export default function StudentAuthPage() {
         <p className="mt-1 text-sm text-slate-500">{t('auth.student.sub')}</p>
 
         <div className="mt-5 w-full max-w-full space-y-4">
+          {/* Select College — sits above the Student ID / email field. */}
+          <Field
+            icon={Building2}
+            label={t('auth.student.college')}
+            hint={college ? college.id : undefined}
+          >
+            <CollegeSelect
+              value={college}
+              invalid={collegeError}
+              onChange={(c) => {
+                setCollege(c);
+                setCollegeError(false);
+              }}
+            />
+          </Field>
+
           <Field icon={Mail} label={t('auth.student.id')}>
             <AuthInput required value={id} onChange={(e) => setId(e.target.value)} placeholder="e.g. STU-23045" />
           </Field>

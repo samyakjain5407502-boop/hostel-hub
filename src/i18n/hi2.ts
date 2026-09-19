@@ -44,6 +44,8 @@ export const hi2 = {
   'auth.student.title': 'स्टूडेंट पोर्टल',
   'auth.student.sub': 'मेस, शिकायत और इनाम प्रबंधन के लिए अपने रजिस्टर्ड हॉस्टल क्रेडेंशियल से साइन इन करें।',
     'auth.student.id': 'स्टूडेंट आईडी / रजिस्टर्ड ईमेल',
+  'auth.student.college': 'कॉलेज चुनें',
+  'auth.student.collegeRequired': 'आगे बढ़ने के लिए अपना कॉलेज चुनें।',
   'auth.student.mobile': 'मोबाइल नंबर',
   'auth.student.password': 'पासवर्ड',
   'auth.student.otp': 'वन-टाइम पासवर्ड',

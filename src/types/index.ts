@@ -19,12 +19,22 @@ export type Category =
   | 'Hygiene/Cleaning'
   | 'Wi-Fi';
 
+/* Sign-in: college directory entry (mock directory in `CollegeSelect`). */
+export interface College {
+  id: string;
+  name: string;
+}
+
 export interface User {
   id: string;
   name: string;
   role: Role;
   email?: string;
   studentId?: string;
+  /** College affiliation carried with the login request + session. */
+  collegeId?: string;
+  collegeName?: string;
+  mobile?: string;
   avatarHue?: number;
 }
 
