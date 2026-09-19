@@ -158,3 +158,49 @@ Warning: Invalid DOM property `stroke-width`. Did you mean `strokeWidth`?
     at r7 (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:19155)
     at r7 (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:19155)
     at ServerInsertedHTMLProvider (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:24939)
+Warning: Invalid DOM property `stroke-width`. Did you mean `strokeWidth`?
+    at svg
+    at span
+    at LogoMark (webpack-internal:///(ssr)/./src/components/brand.tsx:10:21)
+    at a
+    at div
+    at header
+    at LandingNav (webpack-internal:///(ssr)/./src/components/landing/nav.tsx:17:65)
+    at div
+    at Landing
+    at HomePage
+    at ClientPageRoot (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/client-page.js:14:11)
+    at Lazy
+    at InnerLayoutRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:242:11)
+    at RedirectErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:73:9)
+    at RedirectBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:81:11)
+    at NotFoundErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/not-found-boundary.js:76:9)
+    at NotFoundBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:347:11)
+    at ErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/error-boundary.js:158:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at Lazy
+    at OuterLayoutRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:367:11)
+    at Lazy
+    at ToastProvider (webpack-internal:///(ssr)/./src/components/ui/toast.tsx:31:26)
+    at DbProvider (webpack-internal:///(ssr)/./src/lib/store.tsx:19:23)
+    at LanguageProvider (webpack-internal:///(ssr)/./src/i18n/i18n-context.tsx:109:29)
+    at ThemeProvider (webpack-internal:///(ssr)/./src/components/theme/provider.tsx:27:94)
+    at AppProviders (webpack-internal:///(ssr)/./src/app/providers.tsx:16:98)
+    at Lazy
+    at body
+    at html
+    at RedirectErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:73:9)
+    at RedirectBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:81:11)
+    at ReactDevOverlay (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/react-dev-overlay/app/ReactDevOverlay.js:87:9)
+    at HotReload (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:322:11)
+    at Router (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/app-router.js:202:11)
+    at ErrorBoundaryHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/error-boundary.js:112:9)
+    at ErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/error-boundary.js:158:11)
+    at AppRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/app-router.js:564:13)
+    at Lazy
+    at r7 (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:19155)
+    at r7 (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:19155)
+    at ServerInsertedHTMLProvider (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:24939)

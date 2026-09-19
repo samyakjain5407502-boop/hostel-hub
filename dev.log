@@ -23,3 +23,21 @@
  GET /auth/student 200 in 4215ms
  ✓ Compiled in 2.2s (1510 modules)
  ✓ Compiled in 866ms (1510 modules)
+ GET / 200 in 1337ms
+ GET / 200 in 144ms
+ GET /auth/student 200 in 106ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 4.1s (1590 modules)
+ GET /dashboard 200 in 5015ms
+ ○ Compiling /dashboard/mess ...
+ ✓ Compiled /dashboard/mess in 912ms (1590 modules)
+ GET /dashboard/mess 200 in 1265ms
+ ○ Compiling /dashboard/plate ...
+ ✓ Compiled /dashboard/plate in 1347ms (1606 modules)
+ GET /dashboard/plate 200 in 1546ms
+ ○ Compiling /dashboard/complaints ...
+ ✓ Compiled /dashboard/complaints in 2.1s (1648 modules)
+ ○ Compiling /dashboard/rewards ...
+ ✓ Compiled /dashboard/rewards in 1193ms (1670 modules)
+ GET /dashboard/rewards 200 in 1638ms
+ GET /dashboard 200 in 65ms
