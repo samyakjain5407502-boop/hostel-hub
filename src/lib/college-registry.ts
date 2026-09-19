@@ -3,11 +3,12 @@
 /**
  * College registry (3-portal architecture).
  * ==================================================================
- * Mock-mode persistence for the college directory:
+ * Demo-mode persistence for the college directory:
  *  - directory colleges ship approved;
- *  - colleges a student adds via "+ Add My College Manually" land as
- *    `pending` and appear in the Super-Admin portal (/admin/colleges)
- *    for approval.
+ *  - colleges a student adds via "+ Request My College" land as
+ *    pending (flagged "Pending Approval") and appear in the Super-Admin's
+ *    Manage Colleges section (/admin/colleges) for approve/edit/delete;
+ *  - admins can also create + publish colleges directly with full details.
  *
  * Backed by localStorage in demo mode — swap the internals for a
  * Supabase table when the backend lands; the hook API stays the same.
@@ -19,11 +20,25 @@ import { MOCK_COLLEGES } from '@/components/auth/college-select';
 
 const LS_KEY = 'hostelhub.colleges.v1';
 
+/** Full college profile an admin sets when creating or editing an entry. */
+export interface CollegeDetails {
+  name: string;
+  city: string;
+  address: string;
+  contactEmail: string;
+}
+
 export interface CollegeEntry extends College {
   status: 'approved' | 'pending';
   source: 'directory' | 'manual';
   addedAt: number;
   addedBy?: string;
+  /** Full profile — optional for the seeded directory entries. */
+  details?: CollegeDetails;
+}
+
+function defaultDetails(name: string): CollegeDetails {
+  return { name, city: '', address: '', contactEmail: '' };
 }
 
 function seed(): CollegeEntry[] {
@@ -53,23 +68,43 @@ function persist(entries: CollegeEntry[]) {
   }
 }
 
-/** Register a manually typed college as `pending` for Super-Admin approval. */
-export function addPendingCollege(name: string, addedBy?: string): CollegeEntry | null {
-  const clean = (name ?? '').trim();
-  if (clean.length < 2) return null;
+/** Shared by the admin "Add New College" dialog and the student request flow. */
+export function createCollege(
+  input: Partial<CollegeDetails> & { name: string; status?: 'approved' | 'pending'; source?: 'directory' | 'manual'; addedBy?: string }
+): CollegeEntry | null {
+  const name = (input.name ?? '').trim();
+  if (name.length < 2) return null;
   const entries = loadColleges();
-  const existing = entries.find((e) => e.name.toLowerCase() === clean.toLowerCase());
+  const existing = entries.find((e) => e.name.toLowerCase() === name.toLowerCase());
   if (existing) return existing;
+
+  const prefix = input.source === 'manual' ? 'MANUAL' : 'CLG';
+  let id = `${prefix}-${Date.now().toString(36).toUpperCase()}`;
+  while (entries.some((e) => e.id === id)) {
+    id = `${prefix}-${(Date.now() + Math.floor(Math.random() * 1000)).toString(36).toUpperCase()}`;
+  }
+
   const entry: CollegeEntry = {
-    id: `MANUAL-${Date.now().toString(36).toUpperCase()}`,
-    name: clean,
-    status: 'pending',
-    source: 'manual',
+    id,
+    name,
+    status: input.status ?? 'approved',
+    source: input.source ?? 'directory',
     addedAt: Date.now(),
-    addedBy
+    addedBy: input.addedBy,
+    details: {
+      name,
+      city: (input.city ?? '').trim(),
+      address: (input.address ?? '').trim(),
+      contactEmail: (input.contactEmail ?? '').trim()
+    }
   };
   persist([...entries, entry]);
   return entry;
+}
+
+/** Student portal: flag a manually requested college as Pending Approval. */
+export function addPendingCollege(name: string, addedBy?: string): CollegeEntry | null {
+  return createCollege({ name, status: 'pending', source: 'manual', addedBy });
 }
 
 /** Super-Admin action: approve a pending college into the sign-in directory. */
@@ -79,7 +114,26 @@ export function approveCollege(id: string): CollegeEntry[] {
   return entries;
 }
 
-/** Super-Admin action: reject/remove a pending (or any) college entry. */
+/** Admin action: update a college's name/profile (pending or approved). */
+export function updateCollege(
+  id: string,
+  patch: Partial<Omit<CollegeEntry, 'id' | 'addedAt'>>
+): CollegeEntry[] {
+  const entries = loadColleges().map((e) => {
+    if (e.id !== id) return e;
+    const merged: CollegeEntry = { ...e, ...patch };
+    if (patch.details) merged.details = { ...defaultDetails(e.name), ...e.details, ...patch.details };
+    if (typeof patch.name === 'string' && patch.name.trim()) {
+      merged.name = patch.name.trim();
+      merged.details = { ...defaultDetails(merged.name), ...e.details, name: merged.name };
+    }
+    return merged;
+  });
+  persist(entries);
+  return entries;
+}
+
+/** Admin action: delete a college from the directory (any status). */
 export function removeCollege(id: string): CollegeEntry[] {
   const entries = loadColleges().filter((e) => e.id !== id);
   persist(entries);
@@ -112,8 +166,14 @@ export function useCollegeRegistry() {
     approved: colleges.filter((c) => c.status === 'approved'),
     approve: (id: string) => setColleges(approveCollege(id)),
     remove: (id: string) => setColleges(removeCollege(id)),
+    update: (id: string, patch: Partial<Omit<CollegeEntry, 'id' | 'addedAt'>>) =>
+      setColleges(updateCollege(id, patch)),
     addPending: (name: string, addedBy?: string) => {
       addPendingCollege(name, addedBy);
+      refresh();
+    },
+    create: (input: Partial<CollegeDetails> & { name: string; status?: 'approved' | 'pending'; source?: 'directory' | 'manual'; addedBy?: string }) => {
+      createCollege(input);
       refresh();
     },
     refresh

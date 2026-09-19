@@ -14,6 +14,7 @@ import { Check, ChevronDown, Plus, Undo2 } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { inputBase } from '@/components/ui/field';
+import { useCollegeRegistry } from '@/lib/college-registry';
 import type { College } from '@/types';
 
 /** Mock directory — replace with a real API when available. */
@@ -34,13 +35,21 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const [active, setActive] = React.useState(0);
-  /** Manual-entry mode — toggled by the "+ Add My College Manually" option. */
+  /** Manual-entry mode — toggled by the "+ Request My College" option. */
   const [manual, setManual] = React.useState(false);
   const [manualName, setManualName] = React.useState('');
   const [manualError, setManualError] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const manualRef = React.useRef<HTMLInputElement>(null);
+
+  /* Live directory: approved colleges from the registry (admin-published and
+     seeded entries) with the static mock list as a hydration-safe fallback. */
+  const registry = useCollegeRegistry();
+  const directory = React.useMemo<College[]>(
+    () => (registry.ready && registry.approved.length > 0 ? registry.approved : MOCK_COLLEGES),
+    [registry.ready, registry.approved]
+  );
 
   React.useEffect(() => {
     if (manual) manualRef.current?.focus();
@@ -61,11 +70,11 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
   /** Type-to-filter over name or id; empty query shows the whole list. */
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return MOCK_COLLEGES;
-    return MOCK_COLLEGES.filter(
+    if (!q) return directory;
+    return directory.filter(
       (c) => c.name.toLowerCase().includes(q) || c.id.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, directory]);
 
   /* Click-away closes the options panel. */
   React.useEffect(() => {
@@ -79,7 +88,7 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
 
   function openList() {
     setQuery('');
-    setActive(Math.max(0, MOCK_COLLEGES.findIndex((c) => c.id === value?.id)));
+    setActive(Math.max(0, directory.findIndex((c) => c.id === value?.id)));
     setOpen(true);
   }
 
@@ -187,7 +196,7 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
               className="flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border border-dashed border-brand-300 px-2.5 py-1.5 text-left text-sm font-semibold text-brand-700 outline-none transition hover:bg-brand-50"
             >
               <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="min-w-0 flex-1 truncate">Add My College Manually</span>
+              <span className="min-w-0 flex-1 truncate">Request My College</span>
             </button>
           </li>
         </ul>
@@ -197,7 +206,7 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
       {manual && (
         <div className="mt-2 rounded-xl border border-dashed border-brand-300 bg-brand-50/60 p-3">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold text-brand-800">Add My College Manually</p>
+            <p className="text-xs font-semibold text-brand-800">Request My College</p>
             <button
               type="button"
               onClick={() => {
@@ -222,7 +231,7 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
             className={cn(inputBase, 'mt-2', manualError && 'border-rose-400 focus:border-rose-500 focus:ring-rose-100')}
           />
           <p className="mt-1.5 text-[11px] text-slate-500">
-            Your college is added as <span className="font-semibold text-amber-700">pending</span> and reviewed by the HostelHub management team.
+            Your request is flagged <span className="font-semibold text-amber-700">Pending Approval</span> and reviewed by the HostelHub management team.
           </p>
         </div>
       )}
