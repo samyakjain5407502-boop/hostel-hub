@@ -2,18 +2,22 @@
 
 import {
   LayoutDashboard, UtensilsCrossed, Star, LifeBuoy, Gift, Trophy, Wallet,
-  Users, Utensils, KanbanSquare, Radar, X, Receipt, QrCode, Grid3x3, UserPlus
+  Users, Utensils, KanbanSquare, Radar, X, Receipt, QrCode, Grid3x3, UserPlus,
+  Building2, UserCog, ScrollText, ChefHat
 } from 'lucide-react';
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { LogoMark } from '@/components/brand';
 import { useLang, TKey } from '@/i18n';
 import { cn } from '@/lib/utils';
+import { PORTAL_HOME } from '@/lib/portals';
 import type { Role } from '@/types';
 
 interface NavItem {
   href: string;
-  key: TKey;
+  /** i18n key — omit and set `label` for plain-text items (operator/admin consoles). */
+  key?: TKey;
+  label?: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
@@ -33,20 +37,27 @@ const STUDENT_NAV: NavItem[] = [
 const ADMIN_NAV: NavItem[] = [
   { href: '/admin', key: 'admin.title', icon: LayoutDashboard },
   { href: '/admin/headcount', key: 'nav.headcountAdmin', icon: Users },
+  { href: '/admin/colleges', label: 'Colleges & Hostels', icon: Building2 },
+  { href: '/admin/operators', label: 'Operator Onboarding', icon: UserCog },
   { href: '/admin/inventory', key: 'nav.inventory', icon: Grid3x3 },
   { href: '/admin/admissions', key: 'nav.admissions', icon: UserPlus },
   { href: '/admin/menu', key: 'nav.menuAdmin', icon: Utensils },
   { href: '/admin/complaints', key: 'nav.complaintsAdmin', icon: KanbanSquare },
   { href: '/admin/gatepass', key: 'nav.gatepass', icon: QrCode },
-  { href: '/admin/rewards', key: 'nav.rewardsAdmin', icon: Radar }
+  { href: '/admin/rewards', key: 'nav.rewardsAdmin', icon: Radar },
+  { href: '/admin/logs', label: 'System Logs', icon: ScrollText }
+];
+
+const OPERATOR_NAV: NavItem[] = [
+  { href: '/mess-operator', label: 'Operator Console', icon: ChefHat }
 ];
 
 export function Sidebar({ role, pathname, open, onClose }: {
   role: Role; pathname: string; open: boolean; onClose: () => void;
 }) {
   const { t } = useLang();
-  const nav = role === 'admin' ? ADMIN_NAV : STUDENT_NAV;
-  const home = role === 'admin' ? '/admin' : '/dashboard';
+  const nav = role === 'admin' ? ADMIN_NAV : role === 'operator' ? OPERATOR_NAV : STUDENT_NAV;
+  const home = PORTAL_HOME[role];
 
   /* Escape closes the drawer — keyboard parity with tapping the backdrop. */
   React.useEffect(() => {
@@ -145,7 +156,7 @@ function NavList({ nav, t, pathname, onClick }: {
             )}
           >
             <Icon className={cn('h-4.5 w-4.5 shrink-0', active ? 'text-brand-600' : 'text-slate-400')} aria-hidden="true" />
-            <span className="min-w-0 flex-1 truncate">{t(item.key)}</span>
+            <span className="min-w-0 flex-1 truncate">{item.key ? t(item.key) : item.label}</span>
             {active && (
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-600" aria-hidden="true" />
             )}

@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { useLang } from '@/i18n';
 
 export interface AuthConfig {
-  role: 'student' | 'admin';
+  role: 'student' | 'operator' | 'admin';
   title: string;
   sub: string;
   accentRing: string;

@@ -11,10 +11,14 @@ import { NotificationBell } from '@/components/notification-bell';
 import { Avatar } from '@/components/ui/avatar';
 import { useLang } from '@/i18n';
 import { clientSignOut } from '@/lib/client-session';
+import { PORTAL_HOME, PORTAL_LABEL } from '@/lib/portals';
 import type { Role } from '@/types';
 
 export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; onMenuClick: () => void }) {
   const { t } = useLang();
+  const home = PORTAL_HOME[role];
+  const portalLabel = role === 'admin' ? t('nav.adminPortal') : role === 'operator' ? PORTAL_LABEL.operator : t('nav.studentPortal');
+  const homeLabel = role === 'admin' ? t('admin.title') : role === 'operator' ? 'Operator Console' : t('nav.dashboard');
 
   return (
     <header className="glass-header sticky top-0 z-40 w-full max-w-full overflow-x-clip">
@@ -28,13 +32,13 @@ export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; 
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        <a href={role === 'admin' ? '/admin' : '/dashboard'} className="flex min-w-0 items-center gap-2">
+        <a href={home} className="flex min-w-0 items-center gap-2">
           <LogoMark />
           <span className="truncate font-display text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
             Hostel<span className="text-brand-600">Hub</span>
           </span>
           <span className="ml-1 hidden rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500 md:inline-flex">
-            {role === 'admin' ? t('nav.adminPortal') : t('nav.studentPortal')}
+            {portalLabel}
           </span>
         </a>
 
@@ -42,14 +46,16 @@ export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; 
           <ThemeToggle />
           <LanguageSwitcher />
           <NotificationBell />
-          <UserMenu role={role} name={name} />
+          <UserMenu role={role} name={name} portalLabel={portalLabel} home={home} homeLabel={homeLabel} />
         </div>
       </div>
     </header>
   );
 }
 
-function UserMenu({ role, name }: { role: Role; name: string }) {
+function UserMenu({ role, name, portalLabel, home, homeLabel }: {
+  role: Role; name: string; portalLabel: string; home: string; homeLabel: string;
+}) {
   const { t } = useLang();
   return (
     <RadixDropdown.Root>
@@ -67,16 +73,16 @@ function UserMenu({ role, name }: { role: Role; name: string }) {
             <Avatar name={name} size="sm" />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-800">{name}</p>
-              <p className="text-[11px] text-slate-400">{role === 'admin' ? t('nav.adminPortal') : t('nav.studentPortal')}</p>
+              <p className="text-[11px] text-slate-400">{portalLabel}</p>
             </div>
           </div>
           <RadixDropdown.Separator className="mx-2 my-1 h-px bg-slate-200" />
           <RadixDropdown.Item
-            onSelect={() => { window.location.href = role === 'admin' ? '/admin' : '/dashboard'; }}
+            onSelect={() => { window.location.href = home; }}
             className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-slate-700 outline-none data-[highlighted]:bg-brand-50"
           >
             <Home className="h-4 w-4" aria-hidden="true" />
-            {role === 'admin' ? t('admin.title') : t('nav.dashboard')}
+            {homeLabel}
           </RadixDropdown.Item>
           <RadixDropdown.Item
             onSelect={clientSignOut}

@@ -10,7 +10,7 @@
  * (or hydrate from a `/api/colleges` endpoint) when the backend lands.
  */
 
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Plus, Undo2 } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { inputBase } from '@/components/ui/field';
@@ -27,14 +27,36 @@ export const MOCK_COLLEGES: College[] = [
 
 export function CollegeSelect({ value, onChange, invalid = false }: {
   value: College | null;
-  onChange: (college: College) => void;
+  /** `null` clears the selection (e.g. leaving manual-entry mode). */
+  onChange: (college: College | null) => void;
   invalid?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const [active, setActive] = React.useState(0);
+  /** Manual-entry mode — toggled by the "+ Add My College Manually" option. */
+  const [manual, setManual] = React.useState(false);
+  const [manualName, setManualName] = React.useState('');
+  const [manualError, setManualError] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const manualRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (manual) manualRef.current?.focus();
+  }, [manual]);
+
+  /** Emit the typed college live once it is long enough to be meaningful. */
+  function onManualChange(name: string) {
+    setManualName(name);
+    const clean = name.trim();
+    if (clean.length >= 2) {
+      setManualError(false);
+      onChange({ id: 'MANUAL', name: clean, status: 'pending', source: 'manual' });
+    } else {
+      setManualError(clean.length > 0);
+    }
+  }
 
   /** Type-to-filter over name or id; empty query shows the whole list. */
   const filtered = React.useMemo(() => {
@@ -63,6 +85,8 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
 
   function pick(college: College) {
     onChange(college);
+    setManual(false);
+    setManualName('');
     setOpen(false);
     inputRef.current?.focus();
   }
@@ -84,8 +108,8 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
     }
   }
 
-  /* Closed: show the selection. Open: show the search text. */
-  const shown = open ? query : (value?.name ?? '');
+  /* Closed: show the selection. Open: show the search text (or the manual name). */
+  const shown = open ? query : (manual ? manualName : (value?.name ?? ''));
 
   return (
     <div ref={rootRef} className="relative w-full max-w-full">
@@ -148,7 +172,59 @@ export function CollegeSelect({ value, onChange, invalid = false }: {
               </li>
             );
           })}
+
+          {/* Manual entry — always the last option in the list. */}
+          <li role="option" aria-selected={manual} className="mt-1 border-t border-slate-200 pt-1">
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setOpen(false);
+                setManual(true);
+                setManualName('');
+                setManualError(false);
+              }}
+              className="flex w-full cursor-pointer select-none items-center gap-2 rounded-lg border border-dashed border-brand-300 px-2.5 py-1.5 text-left text-sm font-semibold text-brand-700 outline-none transition hover:bg-brand-50"
+            >
+              <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className="min-w-0 flex-1 truncate">Add My College Manually</span>
+            </button>
+          </li>
         </ul>
+      )}
+
+      {/* Manual-entry panel — the student types their college's exact name. */}
+      {manual && (
+        <div className="mt-2 rounded-xl border border-dashed border-brand-300 bg-brand-50/60 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold text-brand-800">Add My College Manually</p>
+            <button
+              type="button"
+              onClick={() => {
+                setManual(false);
+                setManualName('');
+                setManualError(false);
+                onChange(null);
+              }}
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700"
+            >
+              <Undo2 className="h-3.5 w-3.5" aria-hidden="true" /> Use list instead
+            </button>
+          </div>
+          <input
+            ref={manualRef}
+            type="text"
+            required
+            value={manualName}
+            onChange={(e) => onManualChange(e.target.value)}
+            placeholder="e.g. Medi-Caps University"
+            aria-label="College name"
+            className={cn(inputBase, 'mt-2', manualError && 'border-rose-400 focus:border-rose-500 focus:ring-rose-100')}
+          />
+          <p className="mt-1.5 text-[11px] text-slate-500">
+            Your college is added as <span className="font-semibold text-amber-700">pending</span> and reviewed by the HostelHub management team.
+          </p>
+        </div>
       )}
     </div>
   );

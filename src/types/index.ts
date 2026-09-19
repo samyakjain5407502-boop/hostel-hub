@@ -1,6 +1,6 @@
 /* Domain types for HostelHub */
 
-export type Role = 'student' | 'admin';
+export type Role = 'student' | 'operator' | 'admin';
 
 export type Lang = 'en' | 'hi' | 'hinglish';
 
@@ -23,6 +23,10 @@ export type Category =
 export interface College {
   id: string;
   name: string;
+  /** `pending` = manually added, awaiting Super-Admin approval. */
+  status?: 'approved' | 'pending';
+  /** Where the entry came from. */
+  source?: 'directory' | 'manual';
 }
 
 export interface User {

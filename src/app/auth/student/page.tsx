@@ -11,6 +11,7 @@ import { inputBase } from '@/components/ui/field';
 import { useLang, type TKey } from '@/i18n';
 import { DEMO_STUDENT, demoStudentUser } from '@/lib/auth';
 import { clientLogin } from '@/lib/client-session';
+import { addPendingCollege } from '@/lib/college-registry';
 import type { College } from '@/types';
 import { isMockMode } from '@/lib/data-mode';
 import {
@@ -114,6 +115,9 @@ export default function StudentAuthPage() {
     setBusy(true);
     try {
       if (demo) {
+        if (college && (college.id === 'MANUAL' || college.source === 'manual')) {
+          addPendingCollege(college.name, 'demo');
+        }
         await clientLogin(demoStudentUser(college));
         window.location.href = '/dashboard';
         return;
@@ -161,6 +165,11 @@ export default function StudentAuthPage() {
           tone: 'warning'
         });
         return;
+      }
+
+      /* Manually added colleges land in the Super-Admin approval queue. */
+      if (college.id === 'MANUAL' || college.source === 'manual') {
+        addPendingCollege(college.name, cleanId);
       }
 
       /* The login request carries the selected college alongside the

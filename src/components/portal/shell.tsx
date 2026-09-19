@@ -6,6 +6,7 @@ import { Topbar } from '@/components/portal/topbar';
 import { Sidebar } from '@/components/portal/sidebar';
 import { Footer } from '@/components/footer';
 import { getClientSession } from '@/lib/client-session';
+import { PORTAL_AUTH } from '@/lib/portals';
 import { SkeletonCard } from '@/components/ui/skeleton';
 import type { Role } from '@/types';
 
@@ -17,7 +18,7 @@ export function PortalShell({ role, children }: { role: Role; children: React.Re
   React.useEffect(() => {
     getClientSession().then((s) => {
       if (s && s.role === role) setSessionName(s.user.name);
-      else window.location.href = role === 'admin' ? '/auth/admin' : '/auth/student';
+      else window.location.href = PORTAL_AUTH[role];
     });
   }, [role]);
 

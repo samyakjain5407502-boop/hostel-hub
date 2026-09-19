@@ -285,3 +285,80 @@ Import trace for requested module:
 ./src/lib/otp.ts
 ./src/components/auth/otp-banner.tsx
 ./src/app/auth/student/page.tsx
+ ⨯ ./src/middleware.ts
+Error: 
+  [31mx[0m the name `NextResponse` is defined multiple times
+    ,-[[36;1;4mC:\Users\jainj\OneDrive\Desktop\Hostel Hub\src\middleware.ts[0m:1:1]
+ [2m 1[0m | import { NextResponse } from 'next/server';
+    : [31;1m         ^^^^^^|^^^^^[0m
+    :                [31;1m`-- [31;1mprevious definition of `NextResponse` here[0m[0m
+ [2m 2[0m | import type { NextRequest } from 'next/server';
+ [2m 3[0m | import { verifySession, COOKIE } from '@/lib/auth';
+ [2m 4[0m | 
+ [2m 5[0m | /**
+ [2m 6[0m |  * Role-based redirect middleware (Next.js App Router) — 3-portal edition.
+ [2m 7[0m |  *  - /auth/*        → redirects already signed-in users to their portal home
+ [2m 8[0m |  *  - /dashboard     → student-only
+ [2m 9[0m |  *  - /mess-operator → mess-operator-only
+ [2m10[0m |  *  - /admin/*       → super-admin-only
+ [2m11[0m |  * Each role can never reach another role's portal.
+ [2m12[0m |  */
+ [2m13[0m | import { NextResponse } from 'next/server';
+    : [33;1m         ^^^^^^|^^^^^[0m
+    :                [33;1m`-- [33;1m`NextResponse` redefined here[0m[0m
+ [2m14[0m | import type { NextRequest } from 'next/server';
+ [2m15[0m | import { verifySession, COOKIE } from '@/lib/auth';
+ [2m15[0m | import type { Role } from '@/types';
+    `----
+
+  [31mx[0m the name `verifySession` is defined multiple times
+    ,-[[36;1;4mC:\Users\jainj\OneDrive\Desktop\Hostel Hub\src\middleware.ts[0m:1:1]
+ [2m 1[0m | import { NextResponse } from 'next/server';
+ [2m 2[0m | import type { NextRequest } from 'next/server';
+ [2m 3[0m | import { verifySession, COOKIE } from '@/lib/auth';
+    : [31;1m         ^^^^^^|^^^^^^[0m
+    :                [31;1m`-- [31;1mprevious definition of `verifySession` here[0m[0m
+ [2m 4[0m | 
+ [2m 5[0m | /**
+ [2m 6[0m |  * Role-based redirect middleware (Next.js App Router) — 3-portal edition.
+ [2m 7[0m |  *  - /auth/*        → redirects already signed-in users to their portal home
+ [2m 8[0m |  *  - /dashboard     → student-only
+ [2m 9[0m |  *  - /mess-operator → mess-operator-only
+ [2m10[0m |  *  - /admin/*       → super-admin-only
+ [2m11[0m |  * Each role can never reach another role's portal.
+ [2m12[0m |  */
+ [2m13[0m | import { NextResponse } from 'next/server';
+ [2m14[0m | import type { NextRequest } from 'next/server';
+ [2m15[0m | import { verifySession, COOKIE } from '@/lib/auth';
+    : [33;1m         ^^^^^^|^^^^^^[0m
+    :                [33;1m`-- [33;1m`verifySession` redefined here[0m[0m
+ [2m16[0m | import type { Role } from '@/types';
+ [2m17[0m | 
+ [2m17[0m | const PORTAL_HOME: Record<Role, string> = {
+    `----
+
+  [31mx[0m the name `COOKIE` is defined multiple times
+    ,-[[36;1;4mC:\Users\jainj\OneDrive\Desktop\Hostel Hub\src\middleware.ts[0m:1:1]
+ [2m 1[0m | import { NextResponse } from 'next/server';
+ [2m 2[0m | import type { NextRequest } from 'next/server';
+ [2m 3[0m | import { verifySession, COOKIE } from '@/lib/auth';
+    : [31;1m                        ^^^|^^[0m
+    :                            [31;1m`-- [31;1mprevious definition of `COOKIE` here[0m[0m
+ [2m 4[0m | 
+ [2m 5[0m | /**
+ [2m 6[0m |  * Role-based redirect middleware (Next.js App Router) — 3-portal edition.
+ [2m 7[0m |  *  - /auth/*        → redirects already signed-in users to their portal home
+ [2m 8[0m |  *  - /dashboard     → student-only
+ [2m 9[0m |  *  - /mess-operator → mess-operator-only
+ [2m10[0m |  *  - /admin/*       → super-admin-only
+ [2m11[0m |  * Each role can never reach another role's portal.
+ [2m12[0m |  */
+ [2m13[0m | import { NextResponse } from 'next/server';
+ [2m14[0m | import type { NextRequest } from 'next/server';
+ [2m15[0m | import { verifySession, COOKIE } from '@/lib/auth';
+    : [33;1m                        ^^^|^^[0m
+    :                            [33;1m`-- [33;1m`COOKIE` redefined here[0m[0m
+ [2m16[0m | import type { Role } from '@/types';
+ [2m17[0m | 
+ [2m17[0m | const PORTAL_HOME: Record<Role, string> = {
+    `----
