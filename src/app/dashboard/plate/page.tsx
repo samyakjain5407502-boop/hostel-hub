@@ -14,14 +14,6 @@ import { MEAL_SLOT_META, TODAY_KEY } from '@/lib/data/seed-meals';
 import { cn } from '@/lib/utils';
 import type { Meal } from '@/types';
 
-/** Canonical thali components offered at every counter, per slot. */
-const PLATE_ITEMS: Record<Meal['slot'], string[]> = {
-  breakfast: ['Poha', 'Milk', 'Bread', 'Chai'],
-  lunch: ['Roti', 'Sabji', 'Dal', 'Chawal'],
-  snacks: ['Vada Pav', 'Cold Coffee', 'Fruit'],
-  dinner: ['Chapati', 'Paneer', 'Dal', 'Chawal']
-};
-
 const FOOD_CHARGE = 2600; // monthly mess charge used for the absence estimate
 
 export default function PlatePage() {
@@ -43,7 +35,9 @@ export default function PlatePage() {
     setSweet(saved?.sweetOptIn ?? false);
   }, [mealId, saved]);
 
-  const offered = meal ? PLATE_ITEMS[meal.slot] : [];
+  /* Live menu from the store — the mess operator's "Edit Today's Menu"
+     changes (names, stock, extra pricing) show up here in real time. */
+  const offered = meal ? meal.items : [];
   const absentDays = saved?.absenceDays ?? [];
   const deduction = db.absenceDeduction(FOOD_CHARGE, absentDays.length);
 
@@ -93,7 +87,7 @@ export default function PlatePage() {
             icon={<Utensils className="h-5 w-5" />}
             action={<Badge tone={statusTone} dot>{statusLabel}</Badge>}
           />
-          <PlateItems offered={offered} draft={draft} onToggle={toggleItem} />
+          <PlateItems offered={offered} meta={meal?.menuMeta} draft={draft} onToggle={toggleItem} />
 
           {/* Optional sweet dish — priced add-on */}
           <label className="mt-3 flex w-full max-w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3">
@@ -122,27 +116,41 @@ export default function PlatePage() {
   );
 }
 
-function PlateItems({ offered, draft, onToggle }: {
-  offered: string[]; draft: string[]; onToggle: (item: string) => void;
+function PlateItems({ offered, meta, draft, onToggle }: {
+  offered: string[]; meta?: Meal['menuMeta']; draft: string[]; onToggle: (item: string) => void;
 }) {
   return (
     <ul className="mt-4 grid w-full max-w-full gap-2 sm:grid-cols-2">
       {offered.map((item) => {
         const on = draft.includes(item);
+        const out = meta?.[item]?.available === false;
+        const price = meta?.[item]?.price ?? 0;
         return (
           <li key={item} className="min-w-0">
             <button
-              onClick={() => onToggle(item)}
+              onClick={() => { if (!out) onToggle(item); }}
+              disabled={out}
               aria-pressed={on}
               className={cn(
                 'flex w-full max-w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition',
-                on ? 'border-success-300 bg-success-50 text-success-800' : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:bg-brand-50'
+                out
+                  ? 'cursor-not-allowed border-rose-200 bg-rose-50/60 text-rose-500'
+                  : on
+                    ? 'border-success-300 bg-success-50 text-success-800'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:bg-brand-50'
               )}
             >
-              <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-md border', on ? 'border-success-500 bg-success-500 text-white' : 'border-slate-300 bg-white')}>
-                {on ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : null}
+              <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-md border', on && !out ? 'border-success-500 bg-success-500 text-white' : 'border-slate-300 bg-white')}>
+                {on && !out ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : null}
               </span>
-              <span className="min-w-0 break-anywhere">{item}</span>
+              <span className={cn('min-w-0 break-anywhere', out && 'line-through')}>{item}</span>
+              <span className="ml-auto shrink-0 text-[11px] font-semibold">
+                {out ? (
+                  <span className="text-rose-500">Out of stock</span>
+                ) : price > 0 ? (
+                  <span className="text-brand-600">+₹{price}</span>
+                ) : null}
+              </span>
             </button>
           </li>
         );

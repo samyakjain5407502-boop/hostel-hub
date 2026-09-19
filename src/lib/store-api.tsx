@@ -77,6 +77,39 @@ export function buildApi(
     commit({ ...db, poll });
   }
 
+  /**
+   * Mess Operator "Edit Today's Menu": rename an item, toggle it in/out of
+   * stock, or set its extra price (₹). Written straight into the shared
+   * snapshot so the student Mess/Plate pages update in real time.
+   */
+  function updateMenuItem(
+    mealId: string,
+    item: string,
+    patch: { name?: string; available?: boolean; price?: number }
+  ) {
+    const week = db.week.map((day) => ({
+      ...day,
+      meals: day.meals.map((m) => {
+        if (m.id !== mealId) return m;
+        const index = m.items.indexOf(item);
+        if (index === -1) return m;
+        const meta = { ...(m.menuMeta ?? {}) };
+        const prev = meta[item] ?? { available: true, price: 0 };
+        const next = {
+          name: (patch.name ?? item).trim() || item,
+          available: patch.available ?? prev.available,
+          price: Math.max(0, Math.round(patch.price ?? prev.price))
+        };
+        delete meta[item];
+        meta[next.name] = next;
+        const items = [...m.items];
+        items[index] = next.name;
+        return { ...m, items, menuMeta: meta };
+      })
+    }));
+    commit({ ...db, week });
+  }
+
   function scratchGift(): { perk: PerkInline; points: number } | null {
     if (db.gifts.scratchLeft <= 0) return null;
     const perk = PERK_LIST[Math.floor(Math.random() * PERK_LIST.length)];
@@ -365,7 +398,7 @@ export function buildApi(
   }
 
   return {
-    ...db, optMeal, rateMeal, addComplaint, upvoteComplaint, votePoll,
+    ...db, optMeal, rateMeal, addComplaint, upvoteComplaint, votePoll, updateMenuItem,
     scratchGift, claimPerk, markRead, setComplaintStatus, broadcast,
     adjustPoll, addPollOption, resetDemo,
     registerOwner, registerBranch, toggleSponsor,

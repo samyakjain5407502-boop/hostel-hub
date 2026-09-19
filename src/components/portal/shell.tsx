@@ -49,7 +49,7 @@ export function PortalShell({ role, children }: { role: Role; children: React.Re
        still guaranteeing the shell can never scroll sideways. */
     <div className="min-h-dvh w-full max-w-full overflow-x-clip">
       <Topbar role={role} name={sessionName} onMenuClick={() => setMenuOpen(true)} />
-      <div className="mx-auto flex w-full max-w-7xl items-start gap-2 px-3 sm:px-4">
+      <div className="mx-auto flex w-full max-w-7xl items-start gap-3 px-4 sm:px-6">
         <Sidebar role={role} pathname={pathname} open={menuOpen} onClose={() => setMenuOpen(false)} />
         <main id="main" className="min-h-[72dvh] w-full min-w-0 flex-1 py-5 sm:py-6">
           <div key={pathname} className="w-full max-w-full">

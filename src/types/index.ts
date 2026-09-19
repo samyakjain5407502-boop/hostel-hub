@@ -65,6 +65,12 @@ export interface Meal {
   time: string;
   status: MealStatus;
   items: string[];
+  /**
+   * Per-item service metadata maintained by the Mess Operator
+   * ("Edit Today's Menu"): live availability and extra pricing (₹).
+   * Keyed by item name; absent items default to available / ₹0.
+   */
+  menuMeta?: Record<string, { available: boolean; price: number }>;
   credits: number; // cost if dining without subscription diversion
   veg: boolean;
   participating: number;

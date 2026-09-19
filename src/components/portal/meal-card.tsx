@@ -54,9 +54,24 @@ export function MealCard({ meal, interactive = true }: { meal: Meal; interactive
       </p>
 
       <div className="mt-2.5 flex flex-wrap gap-1.5">
-        {meal.items.map((item) => (
-          <span key={item} className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">{item}</span>
-        ))}
+        {meal.items.map((item) => {
+          const meta = meal.menuMeta?.[item];
+          const out = meta?.available === false;
+          const price = meta?.price ?? 0;
+          return (
+            <span
+              key={item}
+              className={cn(
+                'rounded-full px-2 py-0.5 text-[11px] font-medium',
+                out ? 'bg-rose-50 text-rose-600 line-through' : 'bg-slate-100 text-slate-600'
+              )}
+            >
+              {item}
+              {!out && price > 0 && <span className="ml-1 font-semibold text-brand-600">+₹{price}</span>}
+              {out && <span className="ml-1 font-semibold">Out of stock</span>}
+            </span>
+          );
+        })}
       </div>
 
       <div className="mt-3 flex items-center gap-2">

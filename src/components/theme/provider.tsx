@@ -14,18 +14,18 @@ const Ctx = createContext<ThemeCtx>({ theme: 'light', setTheme: () => {}, toggle
 const KEY = 'hostelhub.theme';
 
 function initialTheme(): Theme {
-  if (typeof window === 'undefined') return 'light';
+  if (typeof window === 'undefined') return 'dark';
   try {
     const saved = window.localStorage.getItem(KEY) as Theme | null;
     if (saved === 'light' || saved === 'dark') return saved;
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
   } catch { /* ignore */ }
-  return 'light';
+  return 'dark';
 }
 
-/** Provides `.dark` class on <html>, persisted in localStorage. */
+/** Provides `.dark` class on <html>, persisted in localStorage. Dark is the default. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
+  const [theme, setThemeState] = useState<Theme>('dark');
 
   useEffect(() => {
     setThemeState(initialTheme());

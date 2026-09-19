@@ -22,7 +22,7 @@ export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; 
 
   return (
     <header className="glass-header sticky top-0 z-40 w-full max-w-full overflow-x-clip">
-      <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-3 py-3 sm:gap-3 sm:px-4">
+      <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 py-3.5 sm:gap-3 sm:px-6">
         <button
           type="button"
           onClick={onMenuClick}
