@@ -42,15 +42,15 @@ export function MealCard({ meal, interactive = true }: { meal: Meal; interactive
   const canOpt = interactive && (meal.status === 'active' || meal.status === 'upcoming');
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-lift">
+    <article className="w-full max-w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-lift">
       <div className="flex items-center justify-between gap-2">
         <span className="text-3xl" aria-hidden="true">{MEAL_SLOT_META[meal.slot].emoji}</span>
         <Badge tone={STATUS_TONE[meal.status]} dot>{t(`meals.status.${meal.status}` as TKey)}</Badge>
       </div>
 
-      <h3 className="mt-2 text-base font-bold text-slate-900">{meal.label}</h3>
-      <p className="flex items-center gap-1 text-xs text-slate-500">
-        <Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> {meal.time} · {t(`meals.slots.${meal.slot}` as TKey)}
+      <h3 className="mt-2 break-anywhere text-base font-bold text-slate-900">{meal.label}</h3>
+      <p className="flex min-w-0 items-center gap-1 text-xs text-slate-500">
+        <Clock3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> <span className="min-w-0 truncate">{meal.time} · {t(`meals.slots.${meal.slot}` as TKey)}</span>
       </p>
 
       <div className="mt-2.5 flex flex-wrap gap-1.5">

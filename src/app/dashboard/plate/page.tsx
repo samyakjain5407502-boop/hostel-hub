@@ -62,14 +62,14 @@ export default function PlatePage() {
   const statusTone = meal.status === 'active' ? 'success' : meal.status === 'upcoming' ? 'sky' : 'amber';
 
   return (
-    <div>
+    <div className="w-full max-w-full">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <h1 className="text-2xl font-extrabold text-slate-900">{t('plate.title')}</h1>
         <p className="mt-1 text-slate-500">{t('plate.sub')}</p>
       </motion.div>
 
-      {/* Meal slot tabs */}
-      <div className="mt-5 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      {/* Meal slot tabs — wrap instead of scrolling so nothing is cut off on phones */}
+      <div className="mt-5 flex w-full max-w-full flex-wrap items-center gap-2">
         {today.meals.map((m) => (
           <button
             key={m.id}
@@ -85,8 +85,8 @@ export default function PlatePage() {
         ))}
       </div>
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="mt-5 grid w-full max-w-full gap-6 lg:grid-cols-3">
+        <Card className="w-full max-w-full lg:col-span-2">
           <CardHeader
             title={t('plate.chooseItems')}
             sub={`${slotLabel} · ${meal.time}`}
@@ -96,16 +96,21 @@ export default function PlatePage() {
           <PlateItems offered={offered} draft={draft} onToggle={toggleItem} />
 
           {/* Optional sweet dish — priced add-on */}
-          <label className="mt-3 flex cursor-pointer items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3">
-            <span className="text-sm font-semibold text-amber-900">{t('plate.sweet')}</span>
-            <input type="checkbox" checked={sweet} onChange={(e) => setSweet(e.target.checked)} className="h-4 w-4 accent-amber-500" />
+          <label className="mt-3 flex w-full max-w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3">
+            <span className="min-w-0 text-sm font-semibold text-amber-900">{t('plate.sweet')}</span>
+            <input type="checkbox" checked={sweet} onChange={(e) => setSweet(e.target.checked)} className="h-4 w-4 shrink-0 accent-amber-500" />
           </label>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button variant="primary" onClick={save} disabled={!draft.length}>
+          {/* Actions go full-width on phones, inline from `sm` up. */}
+          <div className="mt-4 flex w-full max-w-full flex-wrap gap-2">
+            <Button variant="primary" onClick={save} disabled={!draft.length} className="w-full sm:w-auto">
               <Save className="h-4 w-4" aria-hidden="true" /> {t('plate.save')}
             </Button>
-            <Button variant="outline" onClick={() => { db.setPlate(mealId, [], false); setDraft([]); setSweet(false); toast.push({ title: t('plate.skip'), tone: 'info' }); }}>
+            <Button
+              variant="outline"
+              onClick={() => { db.setPlate(mealId, [], false); setDraft([]); setSweet(false); toast.push({ title: t('plate.skip'), tone: 'info' }); }}
+              className="w-full sm:w-auto"
+            >
               <X className="h-4 w-4" aria-hidden="true" /> {t('plate.skip')}
             </Button>
           </div>
@@ -121,23 +126,23 @@ function PlateItems({ offered, draft, onToggle }: {
   offered: string[]; draft: string[]; onToggle: (item: string) => void;
 }) {
   return (
-    <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+    <ul className="mt-4 grid w-full max-w-full gap-2 sm:grid-cols-2">
       {offered.map((item) => {
         const on = draft.includes(item);
         return (
-          <li key={item}>
+          <li key={item} className="min-w-0">
             <button
               onClick={() => onToggle(item)}
               aria-pressed={on}
               className={cn(
-                'flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition',
+                'flex w-full max-w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition',
                 on ? 'border-success-300 bg-success-50 text-success-800' : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:bg-brand-50'
               )}
             >
               <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-md border', on ? 'border-success-500 bg-success-500 text-white' : 'border-slate-300 bg-white')}>
                 {on ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : null}
               </span>
-              {item}
+              <span className="min-w-0 break-anywhere">{item}</span>
             </button>
           </li>
         );
@@ -152,7 +157,7 @@ function AbsencePanel({ mealId, absentDays, count, deduction }: {
   const db = useDb();
   const { t, n } = useLang();
   return (
-    <Card>
+    <Card className="w-full max-w-full">
       <CardHeader title={t('plate.absence')} sub={t('plate.absenceSub')} icon={<CalendarCheck2 className="h-5 w-5" />} />
       <ul className="mt-4 space-y-1.5">
         {db.week.map((d) => {
@@ -163,12 +168,12 @@ function AbsencePanel({ mealId, absentDays, count, deduction }: {
                 onClick={() => db.toggleAbsence(mealId, d.date)}
                 aria-pressed={on}
                 className={cn(
-                  'flex w-full items-center justify-between rounded-xl border px-3 py-2 text-xs font-semibold transition',
+                  'flex w-full max-w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition',
                   on ? 'border-rose-300 bg-rose-50 text-rose-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-100'
                 )}
               >
-                <span>{d.date === TODAY_KEY ? t('common.today') : weekday(d.date)}</span>
-                <span>{d.date.slice(8)}/{d.date.slice(5, 7)}</span>
+                <span className="min-w-0 truncate">{d.date === TODAY_KEY ? t('common.today') : weekday(d.date)}</span>
+                <span className="shrink-0">{d.date.slice(8)}/{d.date.slice(5, 7)}</span>
               </button>
             </li>
           );

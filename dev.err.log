@@ -204,3 +204,84 @@ Warning: Invalid DOM property `stroke-width`. Did you mean `strokeWidth`?
     at r7 (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:19155)
     at r7 (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:19155)
     at ServerInsertedHTMLProvider (C:\Users\jainj\OneDrive\Desktop\Hostel Hub\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:40:24939)
+ ⨯ ./src/lib/otp.ts
+Error: 
+  [31mx[0m Expected '{', got 'interface'
+    ,-[[36;1;4mC:\Users\jainj\OneDrive\Desktop\Hostel Hub\src\lib\otp.ts[0m:48:1]
+ [2m48[0m |   attempts: number;
+ [2m49[0m | }
+ [2m50[0m | 
+ [2m51[0m | export interface OtpVerification {
+    : [31;1m       ^^^^^^^^^[0m
+ [2m52[0m |   ok: boolean;
+ [2m53[0m |   status: OtpStatus;
+ [2m53[0m |   /** Challenge carrying the updated attempt counter — keep it in state. */
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/lib/otp.ts
+./src/app/auth/student/page.tsx
+ ⨯ ./src/lib/otp.ts
+Error: 
+  [31mx[0m Expected '{', got 'interface'
+    ,-[[36;1;4mC:\Users\jainj\OneDrive\Desktop\Hostel Hub\src\lib\otp.ts[0m:48:1]
+ [2m48[0m |   attempts: number;
+ [2m49[0m | }
+ [2m50[0m | 
+ [2m51[0m | export interface OtpVerification {
+    : [31;1m       ^^^^^^^^^[0m
+ [2m52[0m |   ok: boolean;
+ [2m53[0m |   status: OtpStatus;
+ [2m53[0m |   /** Challenge carrying the updated attempt counter — keep it in state. */
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/lib/otp.ts
+./src/app/auth/student/page.tsx
+ ⨯ ./src/lib/otp.ts
+Error: 
+  [31mx[0m Expected '{', got 'interface'
+    ,-[[36;1;4mC:\Users\jainj\OneDrive\Desktop\Hostel Hub\src\lib\otp.ts[0m:48:1]
+ [2m48[0m |   attempts: number;
+ [2m49[0m | }
+ [2m50[0m | 
+ [2m51[0m | export interface OtpVerification {
+    : [31;1m       ^^^^^^^^^[0m
+ [2m52[0m |   ok: boolean;
+ [2m53[0m |   status: OtpStatus;
+ [2m53[0m |   /** Challenge carrying the updated attempt counter — keep it in state. */
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/lib/otp.ts
+./src/app/auth/student/page.tsx
+ ⨯ ./src/lib/otp.ts
+Error: 
+  [31mx[0m Expected '{', got 'interface'
+    ,-[[36;1;4mC:\Users\jainj\OneDrive\Desktop\Hostel Hub\src\lib\otp.ts[0m:48:1]
+ [2m48[0m |   attempts: number;
+ [2m49[0m | }
+ [2m50[0m | 
+ [2m51[0m | export interface OtpVerification {
+    : [31;1m       ^^^^^^^^^[0m
+ [2m52[0m |   ok: boolean;
+ [2m53[0m |   status: OtpStatus;
+ [2m53[0m |   /** Challenge carrying the updated attempt counter — keep it in state. */
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/lib/otp.ts
+./src/components/auth/otp-banner.tsx
+./src/app/auth/student/page.tsx

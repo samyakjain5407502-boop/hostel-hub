@@ -70,7 +70,9 @@ export { COOKIE };
 /* ------------------------------------------------------------------ */
 /* Demo credentials (in production these come from your DB + auth flow) */
 /* ------------------------------------------------------------------ */
-export const DEMO_STUDENT = { id: 'STU-23045', password: 'hostelhub', otp: '482913' };
+/* NOTE: no static OTP lives here — student logins mint a fresh, random
+   6-digit code per session (see `src/lib/otp.ts` + `<OtpBanner />`). */
+export const DEMO_STUDENT = { id: 'STU-23045', password: 'hostelhub' };
 export const DEMO_ADMIN = { id: 'FAC-1001', key: 'HUB-2026', passkey: '447102' };
 
 export function demoStudentUser(): User {

@@ -34,10 +34,28 @@ Everything works **out of the box** with realistic seed data — no API keys req
 
 | Portal  | Route        | Credentials                        |
 |---------|--------------|------------------------------------|
-| Student | `/auth/student` | ID `STU-23045` · pass `hostelhub` · OTP `482913` |
+| Student | `/auth/student` | ID `STU-23045` · pass `hostelhub` · **OTP: generated live, shown on screen** |
 | Admin   | `/auth/admin`   | Key `HUB-2026` · Fac `FAC-1001` · passkey `447102` |
 
 …or hit the **“Use demo account”** button on either login.
+
+### 🔐 Dynamic OTP (never hardcoded)
+
+The student mobile login mints a **brand-new 6-digit code on every send/resend**
+(`src/lib/otp.ts`) instead of shipping a static demo code:
+
+- `generateOtp()` uses `crypto.getRandomValues` (WebCrypto) — no `Math.random` OTPs.
+- Each code lives on an `OtpChallenge` with a **2-minute TTL**, a **5-attempt lock**
+  and a **30-second resend cooldown**; a resend always mints a new code and kills the old one.
+- Validation strictly compares the typed digits against *that session's* challenge
+  (constant-time compare) — the input is never matched against a constant.
+- **Mock mode** (`NEXT_PUBLIC_DATA_MODE=mock`): no SMS is sent, so the freshly generated
+  code is surfaced in a sleek on-screen alert banner (`src/components/auth/otp-banner.tsx`)
+  with per-digit cells, a copy button and a live expiry countdown — plus a toast.
+- **Live mode** (`NEXT_PUBLIC_DATA_MODE=supabase`): `deliverOtp()` posts to
+  `POST /api/otp/send` and `verifyOtp()` to `POST /api/otp/verify`, with ready-made
+  hook comments for **Twilio**, **Fast2SMS** and **Firebase Auth** (see `src/lib/otp.ts`,
+  and the commented keys in `.env.example`).
 
 ---
 

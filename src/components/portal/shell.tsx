@@ -21,9 +21,20 @@ export function PortalShell({ role, children }: { role: Role; children: React.Re
     });
   }, [role]);
 
+  /* Any navigation closes the slide-over drawer (link taps inside it too). */
+  React.useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  /* The full-screen drawer owns the screen — lock the page behind it. */
+  React.useEffect(() => {
+    document.body.classList.toggle('scroll-locked', menuOpen);
+    return () => document.body.classList.remove('scroll-locked');
+  }, [menuOpen]);
+
   if (!sessionName) {
     return (
-      <main className="mx-auto max-w-7xl px-4 py-10">
+      <main className="mx-auto w-full max-w-7xl px-4 py-10">
         <div className="grid gap-5 md:grid-cols-2">
           <SkeletonCard lines={4} />
           <SkeletonCard lines={4} />
@@ -33,12 +44,16 @@ export function PortalShell({ role, children }: { role: Role; children: React.Re
   }
 
   return (
-    <div className="min-h-dvh">
+    /* `overflow-x-clip` (not `hidden`) keeps the sticky top bar working while
+       still guaranteeing the shell can never scroll sideways. */
+    <div className="min-h-dvh w-full max-w-full overflow-x-clip">
       <Topbar role={role} name={sessionName} onMenuClick={() => setMenuOpen(true)} />
-      <div className="mx-auto flex max-w-7xl gap-2 px-4">
+      <div className="mx-auto flex w-full max-w-7xl items-start gap-2 px-3 sm:px-4">
         <Sidebar role={role} pathname={pathname} open={menuOpen} onClose={() => setMenuOpen(false)} />
-        <main className="min-h-[72dvh] w-full min-w-0 flex-1 py-6">
-          <div key={pathname}>{children}</div>
+        <main id="main" className="min-h-[72dvh] w-full min-w-0 flex-1 py-5 sm:py-6">
+          <div key={pathname} className="w-full max-w-full">
+            {children}
+          </div>
         </main>
       </div>
       <Footer />

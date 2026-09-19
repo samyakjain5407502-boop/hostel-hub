@@ -130,6 +130,10 @@
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+  max-width: 100%;
+  /* NOTE: `overflow-x` is intentionally NOT set on <html>: that turns the root
+     into a scroll container and breaks `position: sticky` headers. It is set on
+     <body> instead, which propagates to the viewport (see below). */
 }
 
 body {
@@ -138,6 +142,17 @@ body {
   @apply antialiased;
   font-feature-settings: 'cv02', 'cv03', 'cv04';
   transition: background-color 0.25s ease, color 0.25s ease;
+  /* Root overflow guard: no page may ever scroll sideways on mobile.
+     Wide rails/tables/drawers clip or scroll inside their own container. */
+  overflow-x: hidden;
+  max-width: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Media never pushes a card wider than its parent on small screens. */
+img,
+video {
+  max-width: 100%;
 }
 
 /* Smooth transitions on themed containers */
@@ -268,6 +283,31 @@ td {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ---------- Mobile layout helpers ---------- */
+
+/* Full-screen drawers/dialogs lock the page behind them. */
+body.scroll-locked {
+  overflow: hidden;
+}
+
+/* A slide-over panel owns its scrolling and never bleeds sideways. */
+.drawer-panel {
+  max-width: 100%;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Notched devices: keep fixed bars clear of the home indicator. */
+.safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+
+/* Long ids / labels can never stretch a card past the viewport. */
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ---------- Reduced motion ---------- */

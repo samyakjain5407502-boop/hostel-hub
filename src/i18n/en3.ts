@@ -196,7 +196,7 @@ export const en3 = {
   'toast.passkey.title': 'Passkey challenge',
   'toast.passkey.body': 'Enter 447102 to approve (demo 2FA).',
   'toast.otp.title': 'OTP sent',
-  'toast.otp.body': 'Enter 482913 to continue (demo).',
+  'toast.otp.body': 'Enter the fresh 6-digit code shown on screen.',
   'toast.allOut.title': 'All out for the week',
   'toast.allOut.body': 'New gift boxes unlock every Monday.',
   'toast.ticket.title': 'Ticket created',

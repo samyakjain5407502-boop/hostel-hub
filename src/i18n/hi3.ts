@@ -192,7 +192,7 @@ export const hi3 = {
   'toast.passkey.title': 'पासकी चुनौती',
   'toast.passkey.body': 'स्वीकृति के लिए 447102 डालें (डेमो 2FA)।',
   'toast.otp.title': 'OTP भेजा गया',
-  'toast.otp.body': 'जारी रखने के लिए 482913 डालें (डेमो)।',
+  'toast.otp.body': 'जारी रखने के लिए स्क्रीन पर दिख रहा नया 6-अंकीय कोड डालें।',
   'toast.allOut.title': 'इस हफ़्ते के लिए खत्म',
   'toast.allOut.body': 'नए गिफ्ट बॉक्स हर सोमवार खुलते हैं।',
   'toast.ticket.title': 'टिकट बन गया',

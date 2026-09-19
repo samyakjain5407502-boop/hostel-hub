@@ -1,25 +1,109 @@
 'use client';
 
-import { GraduationCap, Mail, Lock, KeyRound, ShieldAlert, Smartphone } from 'lucide-react';
+import { GraduationCap, Mail, Lock, KeyRound, RefreshCw, ShieldAlert, Smartphone } from 'lucide-react';
 import * as React from 'react';
 import { AuthShell, Spin } from '@/components/auth/shell';
 import { Field } from '@/components/auth/field';
+import { OtpBanner } from '@/components/auth/otp-banner';
 import { Button } from '@/components/ui/button';
 import { inputBase } from '@/components/ui/field';
-import { useLang } from '@/i18n';
+import { useLang, type TKey } from '@/i18n';
 import { DEMO_STUDENT, demoStudentUser } from '@/lib/auth';
 import { clientLogin } from '@/lib/client-session';
+import { isMockMode } from '@/lib/data-mode';
+import {
+  attemptsLeft, createOtpChallenge, deliverOtp, isValidMobile, maskMobile, normalizeMobile,
+  normalizeOtp, resendSecondsLeft, secondsLeft, verifyOtp, type OtpChallenge, type OtpStatus
+} from '@/lib/otp';
 import { useToast } from '@/components/ui/toast';
+
+/** Friendly copy for every way a typed code can be rejected. */
+const OTP_ERROR_KEY: Record<OtpStatus, TKey | null> = {
+  ok: null,
+  empty: 'auth.otp.needed',
+  expired: 'auth.otp.expired',
+  mismatch: 'auth.otp.wrong',
+  locked: 'auth.otp.locked'
+};
 
 export default function StudentAuthPage() {
   const { t } = useLang();
   const toast = useToast();
     const [id, setId] = React.useState('STU-23045');
   const [pw, setPw] = React.useState('');
-  const [otp, setOtp] = React.useState('');
   const [mobile, setMobile] = React.useState('');
-  const [phase, setPhase] = React.useState<'idle' | 'sent'>('idle');
+  const [otp, setOtp] = React.useState('');
+  /** The one live challenge for this session — it owns the freshly minted code. */
+  const [challenge, setChallenge] = React.useState<OtpChallenge | null>(null);
+  const [now, setNow] = React.useState(() => Date.now());
   const [busy, setBusy] = React.useState(false);
+  const otpRef = React.useRef<HTMLInputElement>(null);
+
+  const mockMode = isMockMode();
+  const awaitingOtp = challenge !== null;
+  const ttl = secondsLeft(challenge, now);
+  const resendIn = resendSecondsLeft(challenge, now);
+  const left = attemptsLeft(challenge);
+
+  /* One shared 1-second ticker drives the expiry countdown and resend cooldown. */
+  React.useEffect(() => {
+    if (!awaitingOtp) return;
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [awaitingOtp]);
+
+  /* Drop the cursor straight into the OTP box once a code has been minted. */
+  React.useEffect(() => {
+    if (awaitingOtp) otpRef.current?.focus();
+  }, [awaitingOtp]);
+
+  /**
+   * Mint a brand-new code, hand it to the delivery channel and surface it.
+   * Returns the challenge (or `null` when the gateway refused).
+   */
+  async function issueOtp(mobileDigits: string): Promise<OtpChallenge | null> {
+    const next = createOtpChallenge(mobileDigits);
+    try {
+      await deliverOtp(next);
+    } catch {
+      toast.push({ title: t('auth.otp.gatewayFail'), tone: 'warning' });
+      return null;
+    }
+    setChallenge(next);
+    setOtp('');
+    setNow(Date.now());
+    const masked = maskMobile(next.mobile);
+    toast.push({
+      title: t('auth.otp.toastTitle'),
+      /* Mock mode: show the exact code on screen. Live mode: just confirm the SMS. */
+      body: next.code
+        ? t('auth.otp.toastBody', { code: next.code, mobile: masked })
+        : t('auth.otp.liveNote', { mobile: masked }),
+      tone: 'info'
+    });
+    return next;
+  }
+
+  /** Editing the number invalidates any code that was bound to the old one. */
+  function onMobileChange(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, 10);
+    setMobile(digits);
+    if (challenge && normalizeMobile(digits) !== challenge.mobile) {
+      setChallenge(null);
+      setOtp('');
+    }
+  }
+
+  /** Resend always mints a fresh code — the previous one is never replayed. */
+  async function resend() {
+    if (!challenge || resendIn > 0 || busy) return;
+    setBusy(true);
+    try {
+      await issueOtp(challenge.mobile);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function submit(demo = false) {
     setBusy(true);
@@ -32,40 +116,40 @@ export default function StudentAuthPage() {
 
       const cleanId = id.trim().toUpperCase();
       const cleanPw = pw.trim();
-      const cleanMobile = mobile.trim().replace(/\D/g, '');
 
       if (!cleanId || !cleanPw) {
         toast.push({ title: 'Enter your Student ID and password', tone: 'warning' });
         return;
       }
-
-      const okId = cleanId === DEMO_STUDENT.id;
-      const okPw = cleanPw === DEMO_STUDENT.password;
-      if (!okId || !okPw) {
+      if (cleanId !== DEMO_STUDENT.id || cleanPw !== DEMO_STUDENT.password) {
         toast.push({ title: 'Invalid Student ID or password', tone: 'warning' });
         return;
       }
 
-      if (phase === 'idle') {
-        if (cleanMobile.length < 8) {
-          toast.push({ title: 'Enter a valid mobile number', tone: 'warning' });
+      /* Step 1 — no live challenge yet: validate the mobile and mint one. */
+      if (!challenge) {
+        const digits = normalizeMobile(mobile);
+        if (!isValidMobile(digits)) {
+          toast.push({ title: t('auth.otp.mobileInvalid'), tone: 'warning' });
           return;
         }
-        toast.push({ title: 'OTP sent', body: 'Enter 482913 to continue (demo).', tone: 'info' });
-        setPhase('sent');
+        await issueOtp(digits);
         return;
       }
 
-      if (!otp.trim()) {
-        toast.push({ title: 'Enter the OTP', body: 'The 6-digit code is 482913 (demo).', tone: 'warning' });
+      /* Step 2 — strictly match the input against *this session's* OTP. */
+      const result = await verifyOtp(challenge, otp);
+      setChallenge(result.challenge);
+      if (!result.ok) {
+        const key = OTP_ERROR_KEY[result.status];
+        toast.push({
+          title: key ? t(key) : t('auth.error.invalid'),
+          body: result.status === 'expired' || result.status === 'locked' ? t('auth.otp.resendHint') : undefined,
+          tone: 'warning'
+        });
         return;
       }
 
-      const okOtp = otp.trim() === DEMO_STUDENT.otp;
-      if (!okOtp) {
-        toast.push({ title: 'Wrong OTP', body: 'The 6-digit code is 482913 (demo).', tone: 'warning' });
-        return;
-      }
       await clientLogin(demoStudentUser());
       window.location.href = '/dashboard';
     } catch {
@@ -91,12 +175,12 @@ export default function StudentAuthPage() {
           e.preventDefault();
           void submit();
         }}
-        className="rounded-3xl border border-slate-200 bg-white p-6 shadow-soft"
+        className="w-full max-w-full rounded-3xl border border-slate-200 bg-white p-4 shadow-soft sm:p-6"
       >
         <h1 className="text-xl font-extrabold text-slate-900">{t('auth.student.title')}</h1>
         <p className="mt-1 text-sm text-slate-500">{t('auth.student.sub')}</p>
 
-                <div className="mt-5 space-y-4">
+        <div className="mt-5 w-full max-w-full space-y-4">
           <Field icon={Mail} label={t('auth.student.id')}>
             <AuthInput required value={id} onChange={(e) => setId(e.target.value)} placeholder="e.g. STU-23045" />
           </Field>
@@ -104,47 +188,81 @@ export default function StudentAuthPage() {
             <AuthInput required type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="• • • • • • • •" />
           </Field>
 
-                    {phase === 'idle' && (
-            <Field icon={Smartphone} label={t('auth.student.mobile')} hint={t('auth.student.otpHint')}>
-              <AuthInput
-                required
-                type="tel"
-                inputMode="numeric"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                placeholder="e.g. 9826011223"
-              />
-            </Field>
+          <Field
+            icon={Smartphone}
+            label={t('auth.student.mobile')}
+            hint={challenge ? t('auth.otp.sentTo', { mobile: maskMobile(challenge.mobile) }) : t('auth.student.otpHint')}
+          >
+            <AuthInput
+              required
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              value={mobile}
+              onChange={(e) => onMobileChange(e.target.value)}
+              placeholder="e.g. 9826011223"
+            />
+          </Field>
+
+          {/* Mock mode: the freshly minted code, straight from this session. */}
+          {challenge && mockMode && (
+            <OtpBanner
+              code={challenge.code}
+              mobile={maskMobile(challenge.mobile)}
+              secondsLeft={ttl}
+              attemptsLeft={left}
+            />
           )}
 
-          {phase === 'sent' && (
-            <Field icon={KeyRound} label={`${t('auth.student.otp')} • 6 digits`} hint="6-digit code sent to your mobile">
-              <AuthInput
-                required
-                inputMode="numeric"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="482913"
-              />
-            </Field>
+          {challenge && (
+            <div className="w-full max-w-full">
+              <Field
+                icon={KeyRound}
+                label={`${t('auth.student.otp')} • 6 digits`}
+                hint={ttl > 0 ? t('auth.otp.expiresIn', { s: ttl }) : t('auth.otp.resendHint')}
+              >
+                <AuthInput
+                  ref={otpRef}
+                  required
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  value={otp}
+                  onChange={(e) => setOtp(normalizeOtp(e.target.value))}
+                  placeholder="••••••"
+                  aria-label={t('auth.student.otp')}
+                />
+              </Field>
+              <button
+                type="button"
+                onClick={() => void resend()}
+                disabled={busy || resendIn > 0}
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:text-slate-400"
+              >
+                <RefreshCw className={busy ? 'h-3.5 w-3.5 animate-spin' : 'h-3.5 w-3.5'} aria-hidden="true" />
+                {resendIn > 0 ? t('auth.otp.resendIn', { s: resendIn }) : t('auth.otp.resend')}
+              </button>
+            </div>
           )}
         </div>
 
         <Button type="submit" variant="primary" size="lg" className="mt-5 w-full" disabled={busy}>
-          {busy ? <Spin /> : null} {busy ? 'Checking…' : phase === 'sent' ? t('auth.student.signIn') : t('auth.student.sendOtp')}
+          {busy ? <Spin /> : null} {busy ? 'Checking…' : awaitingOtp ? t('auth.student.signIn') : t('auth.student.sendOtp')}
         </Button>
         <Button type="button" variant="warden" size="lg" className="mt-2.5 w-full" onClick={() => void submit(true)}>
           ✨ {t('auth.student.demo')}
         </Button>
 
         <p className="mt-4 text-center text-xs text-slate-400">
-          <ShieldAlert className="inline h-3.5 w-3.5" aria-hidden="true" /> Protected by OTP + signed tokens. {t('app.institute')}
+          <ShieldAlert className="inline h-3.5 w-3.5" aria-hidden="true" /> Protected by a fresh 6-digit OTP + signed tokens. {t('app.institute')}
         </p>
       </form>
     </AuthShell>
   );
 }
 
-function AuthInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={inputBase} {...props} />;
-}
+/** Thin wrapper so every auth field inherits the shared input recipe (ref-forwarding for autofocus). */
+const AuthInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
+  function AuthInput(props, ref) {
+    return <input ref={ref} className={inputBase} {...props} />;
+  }
+);

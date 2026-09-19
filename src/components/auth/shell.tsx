@@ -19,21 +19,21 @@ export interface AuthConfig {
 
 export function AuthShell({ config, children }: { config: AuthConfig; children: React.ReactNode }) {
   return (
-    <div className="mesh-bg min-h-dvh">
-      <div className="sticky top-0 z-40 flex items-center justify-between gap-3 glass-header px-5 py-3">
-        <a href="/" className="flex items-center gap-2">
+    <div className="mesh-bg min-h-dvh w-full max-w-full overflow-x-clip">
+      <div className="glass-header sticky top-0 z-40 flex w-full max-w-full items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-5">
+        <a href="/" className="flex min-w-0 items-center gap-2">
           <LogoMark />
-          <span className="font-display text-lg font-extrabold tracking-tight text-slate-900">Hostel<span className="text-brand-600">Hub</span></span>
+          <span className="truncate font-display text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">Hostel<span className="text-brand-600">Hub</span></span>
         </a>
         <LanguageSwitcher />
       </div>
 
-      <div id="main" className="mx-auto grid max-w-5xl items-center gap-10 px-5 pb-16 lg:grid-cols-2">
+      <div id="main" className="mx-auto grid w-full max-w-5xl items-center gap-10 px-4 pb-16 sm:px-5 lg:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="order-2 lg:order-1"
+          className="order-2 w-full min-w-0 max-w-full lg:order-1"
         >
           {children}
         </motion.div>

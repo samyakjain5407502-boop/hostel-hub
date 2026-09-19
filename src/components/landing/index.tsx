@@ -10,7 +10,7 @@ import { FinalCta } from './cta';
 
 export function Landing() {
   return (
-    <div className="mesh-bg">
+    <div className="mesh-bg w-full max-w-full overflow-x-clip">
       <LandingNav />
       <Hero />
       <Features />

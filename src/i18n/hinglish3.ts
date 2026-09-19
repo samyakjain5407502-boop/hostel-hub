@@ -193,7 +193,7 @@ export const hinglish3 = {
   'toast.passkey.title': 'Passkey challenge',
   'toast.passkey.body': 'Approve karne ke liye 447102 daalo (demo 2FA).',
   'toast.otp.title': 'OTP bhej diya',
-  'toast.otp.body': 'Aage badhne ke liye 482913 daalo (demo).',
+  'toast.otp.body': 'Aage badhne ke liye screen par dikh raha naya 6-digit code daalo.',
   'toast.allOut.title': 'Is hafte ke liye khatam',
   'toast.allOut.body': 'Naye gift boxes har Monday unlock hote hain.',
   'toast.ticket.title': 'Ticket ban gaya',

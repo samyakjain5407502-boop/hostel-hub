@@ -17,23 +17,28 @@ export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; 
   const { t } = useLang();
 
   return (
-    <header className="glass-header sticky top-0 z-40">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
-        <button onClick={onMenuClick} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 lg:hidden" aria-label="Open menu">
+    <header className="glass-header sticky top-0 z-40 w-full max-w-full overflow-x-clip">
+      <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-3 py-3 sm:gap-3 sm:px-4">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition active:scale-95 lg:hidden"
+          aria-label={t('a11y.openMenu')}
+        >
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
 
-        <a href={role === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-2">
+        <a href={role === 'admin' ? '/admin' : '/dashboard'} className="flex min-w-0 items-center gap-2">
           <LogoMark />
-          <span className="font-display text-lg font-extrabold tracking-tight text-slate-900">
+          <span className="truncate font-display text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
             Hostel<span className="text-brand-600">Hub</span>
           </span>
-          <span className="ml-1 hidden rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500 sm:inline-flex">
+          <span className="ml-1 hidden rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500 md:inline-flex">
             {role === 'admin' ? t('nav.adminPortal') : t('nav.studentPortal')}
           </span>
         </a>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-1.5">
           <ThemeToggle />
           <LanguageSwitcher />
           <NotificationBell />

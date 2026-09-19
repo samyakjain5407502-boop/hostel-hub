@@ -9,9 +9,9 @@ export function Footer() {
   const { t } = useLang();
 
   return (
-    <footer className="border-t border-slate-200 bg-slate-50">
-      <div className="mx-auto max-w-7xl px-4 py-10">
-        <div className="grid gap-8 md:grid-cols-4">
+    <footer className="w-full max-w-full overflow-x-clip border-t border-slate-200 bg-slate-50">
+      <div className="mx-auto w-full max-w-7xl px-4 py-10">
+        <div className="grid w-full max-w-full gap-8 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
               <LogoMark />
@@ -24,9 +24,9 @@ export function Footer() {
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">{t('footer.contact')}</h3>
             <ul className="mt-2.5 space-y-2 text-sm text-slate-600">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-brand-500" aria-hidden="true" /> Samyakthora@gmail.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-brand-500" aria-hidden="true" /> +91 9098088466</li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-brand-500" aria-hidden="true" /> {t('footer.campus')}</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" /> <span className="min-w-0 break-anywhere">Samyakthora@gmail.com</span></li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" /> +91 9098088466</li>
+              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" /> <span className="min-w-0 break-anywhere">{t('footer.campus')}</span></li>
             </ul>
           </div>
 
