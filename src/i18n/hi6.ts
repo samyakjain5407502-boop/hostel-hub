@@ -4,6 +4,7 @@
  */
 export const hi6 = {
   /* ---------- Portal names & shell navigation ---------- */
+  'landing.hero.allPortals': 'सभी 4 पोर्टल',
   'portal.student': 'छात्र पोर्टल',
   'portal.operator': 'मेस ऑपरेटर',
   'portal.management': 'मैनेजमेंट डेस्क',

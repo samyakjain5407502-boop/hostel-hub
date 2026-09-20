@@ -41,8 +41,8 @@ export function Hero() {
           {t('nav.studentPortal')}
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
         </a>
-        <a href="/auth/admin" className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:border-brand-300 hover:text-brand-700">
-          {t('nav.adminPortal')}
+        <a href="/auth" className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:border-brand-300 hover:text-brand-700">
+          {t('landing.hero.allPortals')}
         </a>
       </motion.div>
 

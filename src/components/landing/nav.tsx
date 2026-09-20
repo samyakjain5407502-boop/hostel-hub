@@ -1,24 +1,25 @@
 'use client';
 
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
-import { ChevronDown, GraduationCap, Landmark, ChefHat } from 'lucide-react';
+import { ChevronDown, GraduationCap, Landmark, ChefHat, Building2 } from 'lucide-react';
 import { LogoMark } from '@/components/brand';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme/toggle';
 import { useLang } from '@/i18n';
 
 /**
- * Landing navigation — portal chooser (3-portal architecture).
- * The "Sign in" control offers all three portals: Student, Mess Operator
- * and Admin / Management, each with its own auth route.
+ * Landing navigation — portal chooser (4-tier architecture).
+ * The "Sign in" control offers all four portals: Student, Mess Operator,
+ * Management Desk and Admin, each with its own auth route.
  */
 export function LandingNav() {
   const { t } = useLang();
 
   const portals = [
-    { href: '/auth/student', icon: GraduationCap, title: 'Student Login', sub: 'Mess, complaints, rewards' },
-    { href: '/auth/mess', icon: ChefHat, title: 'Mess Operator Login', sub: 'Headcount, plates, service' },
-    { href: '/auth/admin', icon: Landmark, title: 'Admin / Management Login', sub: 'Colleges, operators, system' }
+    { href: '/auth/student', icon: GraduationCap, title: 'Student Login', sub: 'Mess plates, rewards, gate pass' },
+    { href: '/auth/mess', icon: ChefHat, title: 'Mess Operator Login', sub: 'Headcount, meals, ingredients' },
+    { href: '/auth/management', icon: Building2, title: 'Management Desk Login', sub: 'Admissions, beds, invoices' },
+    { href: '/auth/admin', icon: Landmark, title: 'Developer / Admin Login', sub: 'Colleges, analytics, system' }
   ];
 
   return (
