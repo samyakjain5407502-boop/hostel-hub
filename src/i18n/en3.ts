@@ -14,7 +14,6 @@ export const en3 = {
   'landing.hero.titleHi': 'Smarter',
   'landing.hero.titleB': 'Hostel Living',
   'landing.hero.sub': 'Mess planning that cuts waste, gamified rewards students actually chase, real-time kitchen headcount and fee automation — one platform, four portals.',
-  'landing.hero.ctaExplore': 'Explore All 4 Portals',
   'landing.hero.ctaDemo': 'Instant Demo Access',
   'landing.hero.chip1': 'Mess credits & opt-in',
   'landing.hero.chip2': 'Reward gift boxes',
@@ -64,8 +63,6 @@ export const en3 = {
   'footer.rewards': 'Rewards',
   'footer.complaintCenter': 'Complaint Center',
   'footer.ecoGuide': 'Eco-Points Guide',
-  'footer.campus': 'Your hostel address, India',
-  'footer.tagline2': 'HostelHub — Built for smarter hostel living',
 
   /* ---------- Shared words ---------- */
   'common.eating': 'eating',

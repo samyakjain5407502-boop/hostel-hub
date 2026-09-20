@@ -10,26 +10,29 @@ import { Faq } from '@/components/landing/faq';
 import { FinalCta } from '@/components/landing/cta';
 
 /**
- * HostelHub landing page — rebuilt from the ground up.
+ * HostelHub landing page.
  *
- * Medi-Caps University | Cause ’26
+ * HostelHub — Built for smarter hostel living (independent multi-tenant SaaS).
  *
  * The composition reads as one editorial flow, and every band is intentional:
  *
  *   1. `Hero`        — asymmetrical 7/5 grid, indigo→violet gradient headline,
- *                      integrated live-headcount status bar, product console.
- *   2. `TrustRail`   — measured outcomes first, operator marquee second.
- *   3. `Portals`     — the 4-portal bento hub (7/5 · 5/7) with the admin tile
- *                      carrying the New College / Branch Registration module.
+ *                      integrated live-headcount status bar, product console and
+ *                      a single call to action.
+ *   2. `TrustRail`   — four measured outcomes from live hostel operations.
+ *   3. `Portals`     — the public 3-portal bento (student · mess operator ·
+ *                      management desk) with the new college/branch
+ *                      registration module inside the management tile.
  *   4. `Capabilities`— six engineered promises, each with a hand-built visual.
  *   5. `HowItWorks`  — the operating loop as a numbered rail (no extra boxes).
  *   6. `ImpactBand`  — the single saturated indigo panel on the page.
  *   7. `Faq`         — five real questions, answered in place.
  *   8. `FinalCta`    — one primary action, one staff door, one registration link.
  *
- * `#main` is the skip-link target declared in the root layout. The page itself
- * stays a server component; every interactive band below opts into a client
- * boundary on its own.
+ * Admin Command is deliberately absent from this page: it is a staff-only
+ * surface reached through the header menu or the `/auth` portal hub. `#main` is
+ * the skip-link target declared in the root layout; every interactive band opts
+ * into its own client boundary.
  */
 export default function HomePage() {
   return (

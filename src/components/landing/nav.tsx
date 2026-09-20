@@ -7,7 +7,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme/toggle';
 import { useLang } from '@/i18n';
 import { cn } from '@/lib/utils';
-import { PORTAL_CARDS } from './portals';
+import { PORTAL_UI } from '@/lib/portal-ui';
 
 /**
  * In-page destinations. Each href is rooted at `/` so the same header works on
@@ -103,7 +103,7 @@ function PortalMenu() {
           <RadixDropdown.Label className="px-2.5 pb-1 pt-2 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-600">
             {t('portal.choose')}
           </RadixDropdown.Label>
-          {PORTAL_CARDS.map(({ href, icon: Icon, accent, titleKey, descKey }) => (
+          {PORTAL_UI.map(({ href, icon: Icon, accent, titleKey, descKey, publicFacing }) => (
             <RadixDropdown.Item
               key={href}
               onSelect={() => {
@@ -115,7 +115,14 @@ function PortalMenu() {
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </span>
               <span className="min-w-0">
-                <span className="block truncate font-bold text-slate-800">{t(titleKey)}</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="block truncate font-bold text-slate-800">{t(titleKey)}</span>
+                  {!publicFacing && (
+                    <span className="shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-600">
+                      {t('portal.restricted')}
+                    </span>
+                  )}
+                </span>
                 <span className="block text-xs text-slate-600">{t(descKey)}</span>
               </span>
             </RadixDropdown.Item>

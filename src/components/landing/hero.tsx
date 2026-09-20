@@ -1,23 +1,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, CirclePlay, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Leaf, ShieldCheck, Clock } from 'lucide-react';
 import { useLang, type TKey } from '@/i18n';
-import { LiveConsole } from './console';
 
-const CHIPS: TKey[] = ['landing.hero.chip1', 'landing.hero.chip2', 'landing.hero.chip3', 'landing.hero.chip4'];
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 /**
- * Hero — deliberately asymmetrical (7/5 split: copy left, live console right) so
- * the eye lands on the headline first and then travels into the product.
+ * Hero — deeply engaging, asymmetrical grid that draws the eye.
  *
  * Craft notes:
  *  • The whole headline is one deep indigo→violet gradient that holds 5.7:1–11.4:1
  *    contrast on pure white, and the body copy sits on slate-700 (10.4:1) so the
  *    description stays razor sharp against the pure-white page.
- *  • The eyebrow states ownership up front — Medi-Caps University · Cause ’26 —
- *    straight from the dictionaries (`landing.badge`).
+ *  • The eyebrow states the product category up front — a multi-tenant hostel
+ *    operations platform — straight from the dictionaries (`landing.badge`).
  *  • The live badge is a status bar, not a floating sticker: pulsing green ring,
  *    live headcount and saved waste read as one live sentence.
  *  • Buttons use hand-tuned elevation (`shadow-btn*`) and answer a press with a
@@ -95,35 +92,33 @@ export function Hero() {
             className="mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center"
           >
             <motion.a
-              href="/auth"
+              href="/auth/student"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.97 }}
               transition={{ duration: 0.16, ease: EASE }}
-              className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 px-6 py-3.5 text-sm font-bold text-white shadow-btn-strong transition-shadow duration-300 hover:shadow-btn-hover"
+              className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 px-7 py-3.5 text-sm font-bold text-white shadow-btn-strong transition-shadow duration-300 hover:shadow-btn-hover"
             >
-              {t('landing.hero.ctaExplore')}
+              {t('landing.hero.ctaDemo')}
               <ArrowRight
                 className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1"
                 aria-hidden="true"
               />
             </motion.a>
-
             <motion.a
-              href="/auth/student"
+              href="/auth"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.97 }}
               transition={{ duration: 0.16, ease: EASE }}
-              className="group inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-800 shadow-btn transition duration-300 hover:border-brand-200 hover:text-brand-700 hover:shadow-btn-hover"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-7 py-3.5 text-sm font-bold text-slate-800 shadow-btn transition duration-300 hover:border-brand-200 hover:text-brand-700 hover:shadow-btn-hover"
             >
-              <CirclePlay className="h-4 w-4 shrink-0 text-brand-600" aria-hidden="true" />
-              {t('landing.hero.ctaDemo')}
+              {t('landing.hero.ctaSecondary')}
             </motion.a>
           </motion.div>
 
           <p className="mt-4 text-xs font-semibold text-slate-600">{t('landing.hero.note')}</p>
 
           <ul className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold text-slate-600">
-            {CHIPS.map((key, i) => (
+            {(['landing.hero.chip1', 'landing.hero.chip2', 'landing.hero.chip3', 'landing.hero.chip4'] as const).map((key, i) => (
               <li key={key} className="flex items-center gap-3">
                 {i > 0 && <span aria-hidden="true" className="h-1 w-1 rounded-full bg-slate-300" />}
                 {t(key)}
@@ -141,3 +136,76 @@ export function Hero() {
     </section>
   );
 }
+
+/**
+ * Live console mock — the product surface that sits to the right of the copy.
+ * Deliberately compact so the hero reads as one editorial flow, not two separate
+ * blocks glued together.
+ */
+function LiveConsole() {
+  const { t } = useLang();
+
+  return (
+    <div className="sheen rounded-[1.75rem] border border-slate-200 bg-white shadow-panel-hover">
+      {/* Header strip */}
+      <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-success-500" />
+          <span className="text-[11px] font-bold uppercase tracking-wide text-slate-600">{t('landing.mock.title')}</span>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Clock className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+          <span className="text-[11px] font-semibold text-slate-500">Live</span>
+        </div>
+      </div>
+
+      {/* Body — six compact metric rows, no clutter */}
+      <div className="px-4 py-4">
+        <div className="grid grid-cols-3 gap-3 rounded-xl bg-brand-50 p-3">
+          <div className="flex flex-col items-start gap-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wide text-brand-600">{t('nav.headcount')}</span>
+            <span className="font-display text-2xl font-black tracking-tight text-slate-900">402</span>
+            <span className="text-[10px] font-semibold text-success-600">+{12} now</span>
+          </div>
+          <div className="h-px bg-brand-200 col-span-1" />
+          <div className="flex flex-col items-start gap-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wide text-brand-600">{t('landing.mock.waste')}</span>
+            <span className="font-display text-2xl font-black tracking-tight text-slate-900">2.1 kg</span>
+            <span className="text-[10px] font-semibold text-success-600">this shift</span>
+          </div>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-brand-500" aria-hidden="true" />
+            <span className="text-xs font-semibold text-slate-700">{t('nav.mess')}</span>
+          </div>
+          <span className="text-xs font-bold text-slate-900">87%</span>
+        </div>
+
+        <div className="mt-2 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            <Leaf className="h-4 w-4 text-success-500" aria-hidden="true" />
+            <span className="text-xs font-semibold text-slate-700">{t('game.eco')}</span>
+          </div>
+          <span className="text-xs font-bold text-slate-900">A+</span>
+        </div>
+
+        <div className="mt-2 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-brand-500" aria-hidden="true" />
+            <span className="text-xs font-semibold text-slate-700">{t('nav.complaints')}</span>
+          </div>
+          <span className="text-xs font-bold text-slate-900">0 open</span>
+        </div>
+
+        {/* Mini activity line */}
+        <div className="mt-4 flex items-center gap-2 text-[11px] font-medium text-slate-500">
+          <span className="h-1.5 w-1.5 rounded-full bg-success-500" />
+          {t('landing.hero.liveNow', { n: 402 })} · {t('landing.mock.waste')} 2.1 kg
+        </div>
+      </div>
+    </div>
+  );
+}
+

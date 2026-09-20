@@ -75,3 +75,5 @@ export function TrustRail() {
     </section>
   );
 }
+
+export { TrustRail as TrustBar };

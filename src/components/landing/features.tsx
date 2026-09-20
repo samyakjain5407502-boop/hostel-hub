@@ -84,6 +84,8 @@ export function Capabilities() {
   );
 }
 
+export { Capabilities as Features };
+
 /** Micro-visuals — hand-built, decorative, and deliberately tiny. */
 function Art({ kind, wide }: { kind: ArtKind; wide?: boolean }) {
   const wrap = cn('mt-6 shrink-0', wide && 'lg:mt-0 lg:ml-auto lg:w-52');

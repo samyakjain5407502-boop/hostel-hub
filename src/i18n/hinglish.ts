@@ -11,6 +11,7 @@ export const hinglish = {
   'nav.rewards': 'Rewards & Gifts',
   'nav.leaderboard': 'Leaderboard',
   'nav.wallet': 'Wallet',
+  'nav.headcount': 'Headcount',
   'nav.headcountAdmin': 'Live Headcount',
   'nav.menuAdmin': 'Menu Planner',
   'nav.complaintsAdmin': 'Complaint Triage',

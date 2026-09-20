@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronDown, Mail } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
 import { useLang, type TKey } from '@/i18n';
 import { cn } from '@/lib/utils';
@@ -86,19 +86,6 @@ export function Faq() {
             );
           })}
         </div>
-
-        <p className="mt-6 flex flex-wrap items-center justify-center gap-2 text-center text-xs font-semibold text-slate-600">
-          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-white text-brand-600 shadow-panel">
-            <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-          </span>
-          <a href="mailto:Samyakthora@gmail.com" className="font-bold text-brand-700 hover:text-brand-800">
-            Samyakthora@gmail.com
-          </a>
-          <span aria-hidden="true" className="h-1 w-1 rounded-full bg-slate-300" />
-          <a href="tel:+919098088466" className="font-bold text-brand-700 hover:text-brand-800">
-            +91 9098088466
-          </a>
-        </p>
       </div>
     </section>
   );

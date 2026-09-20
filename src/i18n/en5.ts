@@ -127,6 +127,7 @@ export const en5 = {
   'owner.verify': 'Verify & continue',
   'owner.verified': 'ID verified ✓',
   'owner.branchName': 'Branch / wing name',
+  'owner.presetLabel': 'Or start from a preset',
   'owner.address': 'Address',
   'owner.mealsPerDay': 'Meals per day',
   'owner.fees': 'Monthly fee per room type (₹)',

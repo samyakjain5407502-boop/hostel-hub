@@ -122,6 +122,7 @@ export const hinglish5 = {
   'owner.verify': 'Verify karke aage badho',
   'owner.verified': 'ID verified ✓',
   'owner.branchName': 'Branch / wing ka naam',
+  'owner.presetLabel': 'Ya kisi preset se shuru karo',
   'owner.address': 'Address',
   'owner.mealsPerDay': 'Roz ke meals',
   'owner.fees': 'Har room type ka monthly rent (₹)',

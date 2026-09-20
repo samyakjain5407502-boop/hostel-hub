@@ -122,6 +122,7 @@ export const hi5 = {
   'owner.verify': 'सत्यापित करें और आगे बढ़ें',
   'owner.verified': 'पहचान सत्यापित ✓',
   'owner.branchName': 'ब्रांच / विंग का नाम',
+  'owner.presetLabel': 'या किसी प्रीसेट से शुरू करें',
   'owner.address': 'पता',
   'owner.mealsPerDay': 'प्रति दिन भोजन',
   'owner.fees': 'हर रूम प्रकार का मासिक किराया (₹)',

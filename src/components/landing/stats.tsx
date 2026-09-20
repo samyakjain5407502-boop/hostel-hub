@@ -63,3 +63,5 @@ export function ImpactBand() {
     </section>
   );
 }
+
+export { ImpactBand as StatsStrip };

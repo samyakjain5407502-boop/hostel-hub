@@ -2,7 +2,7 @@
 export const en = {
   'app.name': 'HostelHub',
   'app.tagline': 'One Platform, Smarter Hostel Living',
-  'app.institute': 'HostelHub — Smarter Hostel Living',
+  'app.institute': 'HostelHub — Built for smarter hostel living',
 
   'nav.dashboard': 'Dashboard',
   'nav.mess': 'Mess & Meals',
@@ -11,6 +11,7 @@ export const en = {
   'nav.rewards': 'Rewards',
   'nav.leaderboard': 'Leaderboard',
   'nav.wallet': 'Wallet',
+  'nav.headcount': 'Headcount',
   'nav.headcountAdmin': 'Live Headcount',
   'nav.menuAdmin': 'Menu Planner',
   'nav.complaintsAdmin': 'Complaint Triage',

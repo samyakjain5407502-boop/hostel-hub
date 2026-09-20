@@ -8,7 +8,7 @@ export const en6 = {
   'landing.hero.allPortals': 'All 4 Portals',
   'nav.section.operations': 'Operations',
   'nav.mgmtOperators': 'Operator Onboarding',
-  'nav.adminColleges': 'Colleges & Approvals',
+  'nav.adminColleges': 'Branches & Properties',
   'nav.logsAdmin': 'System Logs',
   'portal.student': 'Student Portal',
   'portal.operator': 'Mess Operator',
@@ -16,6 +16,7 @@ export const en6 = {
   'portal.admin': 'Admin Command',
   'portal.choose': 'Choose your portal',
   'portal.chooseHint': 'Four portals, one platform — pick where you work.',
+  'portal.restricted': 'Authorized access only',
 
   'nav.section.you': 'Your hostel life',
   'nav.section.mess': 'Kitchen counter',
@@ -154,8 +155,8 @@ export const en6 = {
   'admin.diagnostics': 'System diagnostics',
   'admin.allHealthy': 'All systems healthy',
 
-  /* ---------- Landing (redesign) ---------- */
-  'landing.badge': 'Medi-Caps University · Cause ’26',
+  /* ---------- Landing (brand) ---------- */
+  'landing.badge': 'Multi-tenant hostel operations platform',
   'landing.hero.badge': 'Now live for 4 portals',
   'landing.hero.live': 'Live Headcount Active',
   'landing.hero.liveNow': '{n} eating right now',
@@ -164,11 +165,11 @@ export const en6 = {
   'landing.hero.ctaPrimary': 'Open Student Portal',
   'landing.hero.ctaSecondary': 'Explore all portals',
   'landing.hero.note': 'Demo data included · no signup · mobile ready',
-  'landing.trust.title': 'Trusted by hostel operations across the campus',
+  'landing.trust.title': 'Trusted by hostel operations across the network',
   'landing.trust.metric1': 'food waste avoided',
   'landing.trust.metric2': 'rewards issued',
   'landing.trust.metric3': 'ticket SLA met',
-  'landing.trust.partners': 'Trusted by university hostels & operators',
+  'landing.trust.partners': 'Trusted by hostels & PG networks',
   'landing.trust.metric4': 'uptime this term',
   'landing.portals.title': 'Four portals. One source of truth.',
   'landing.portals.sub': 'Every role gets a purpose-built console — students, kitchen, desk and command centre — all reading the same live data.',
@@ -211,11 +212,10 @@ export const en6 = {
   'landing.cta.secondary': 'Staff sign in',
   'landing.cta.foot': 'HostelHub · One Platform, Smarter Hostel Living',
 
-  /* ---------- Footer branding ---------- */
-  'footer.institute': 'Medi-Caps University',
-  'footer.cohort': 'Cause ’26',
-  'footer.brandLine': 'Medi-Caps University | Cause ’26',
-  'footer.contactLine': 'Contact: Samyakthora@gmail.com | +91 9098088466',
+  /* ---------- Footer (brand + support) ---------- */
+  'footer.brandLine': 'HostelHub — Built for smarter hostel living',
+  'footer.portals': 'Portals',
+  'footer.support': 'Support',
 
   /* ---------- Management desk overview ---------- */
   'mgmt.pendingSub': 'waiting for approval',

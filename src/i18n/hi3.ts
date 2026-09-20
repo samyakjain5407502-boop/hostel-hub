@@ -11,7 +11,6 @@ export const hi3 = {
   'landing.hero.titleHi': 'स्मार्ट',
   'landing.hero.titleB': 'हॉस्टल लिविंग',
   'landing.hero.sub': 'अपव्यय घटाने वाली मेस योजना, गेमिफाइड इनाम, रियल-टाइम किचन संख्या और शुल्क ऑटोमेशन — एक प्लेटफ़ॉर्म, चार पोर्टल।',
-  'landing.hero.ctaExplore': 'सभी 4 पोर्टल देखें',
   'landing.hero.ctaDemo': 'तुरंत डेमो एक्सेस',
   'landing.hero.chip1': 'मेस क्रेडिट और ऑप्ट-इन',
   'landing.hero.chip2': 'इनाम गिफ्ट बॉक्स',
@@ -61,8 +60,6 @@ export const hi3 = {
   'footer.rewards': 'इनाम',
   'footer.complaintCenter': 'शिकायत केंद्र',
   'footer.ecoGuide': 'इको-पॉइंट गाइड',
-  'footer.campus': 'आपके हॉस्टल का पता, भारत',
-  'footer.tagline2': 'हॉस्टलहब — स्मार्ट हॉस्टल लिविंग के लिए बना',
 
   /* ---------- Shared words ---------- */
   'common.eating': 'खा रहे हैं',

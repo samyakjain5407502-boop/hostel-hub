@@ -11,7 +11,6 @@ export const hinglish3 = {
   'landing.hero.titleHi': 'Smarter',
   'landing.hero.titleB': 'Hostel Living',
   'landing.hero.sub': 'Mess planning jo waste kaate, gamified rewards sabko pasand, real-time kitchen headcount aur fee automation — ek platform, chaar portal.',
-  'landing.hero.ctaExplore': 'Saare 4 Portals dekho',
   'landing.hero.ctaDemo': 'Instant Demo Access',
   'landing.hero.chip1': 'Mess credits aur opt-in',
   'landing.hero.chip2': 'Reward gift boxes',
@@ -61,8 +60,6 @@ export const hinglish3 = {
   'footer.rewards': 'Rewards',
   'footer.complaintCenter': 'Complaint Center',
   'footer.ecoGuide': 'Eco-Points Guide',
-  'footer.campus': 'Tumhare hostel ka address, India',
-  'footer.tagline2': 'HostelHub — Built for smarter hostel living',
 
   /* ---------- Shared words ---------- */
   'common.eating': 'kha rahe hain',

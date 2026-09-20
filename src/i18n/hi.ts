@@ -11,6 +11,7 @@ export const hi = {
   'nav.rewards': 'इनाम और उपहार',
   'nav.leaderboard': 'लीडरबोर्ड',
   'nav.wallet': 'वॉलेट',
+  'nav.headcount': 'हेडकाउंट',
   'nav.headcountAdmin': 'लाइव हेडकाउंट',
   'nav.menuAdmin': 'मेन्यू प्लानर',
   'nav.complaintsAdmin': 'शिकायत ट्रायेज',

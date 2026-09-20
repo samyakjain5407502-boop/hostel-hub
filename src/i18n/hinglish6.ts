@@ -15,6 +15,7 @@ export const hinglish6 = {
   'portal.admin': 'Admin Command',
   'portal.choose': 'Apna portal chuno',
   'portal.chooseHint': 'Chaar portal, ek platform — jahan kaam karte ho wahan jao.',
+  'portal.restricted': 'Sirf authorized staff ke liye',
 
   'nav.section.you': 'Aapki hostel life',
   'nav.section.mess': 'Kitchen counter',
@@ -153,8 +154,8 @@ export const hinglish6 = {
   'admin.diagnostics': 'System diagnostics',
   'admin.allHealthy': 'Sab systems healthy',
 
-  /* ---------- Landing (redesign) ---------- */
-  'landing.badge': 'Medi-Caps University · Cause ’26',
+  /* ---------- Landing (brand) ---------- */
+  'landing.badge': 'Multi-tenant hostel operations platform',
   'landing.hero.badge': 'Ab 4 portals ke saath live',
   'landing.hero.live': 'Live Headcount Active',
   'landing.hero.liveNow': 'Abhi {n} log kha rahe hain',
@@ -163,11 +164,11 @@ export const hinglish6 = {
   'landing.hero.ctaPrimary': 'Student Portal kholo',
   'landing.hero.ctaSecondary': 'Saare portals dekho',
   'landing.hero.note': 'Demo data included · koi signup nahi · mobile ready',
-  'landing.trust.title': 'Campus bhar ke hostel operations ka bharosa',
+  'landing.trust.title': 'Poore network ke hostel operations ka bharosa',
   'landing.trust.metric1': 'food waste bachaya',
   'landing.trust.metric2': 'rewards diye',
   'landing.trust.metric3': 'ticket SLA meet',
-  'landing.trust.partners': 'University hostels aur operators ka bharosa',
+  'landing.trust.partners': 'Hostels aur PG networks ka bharosa',
   'landing.trust.metric4': 'uptime is term',
   'landing.portals.title': 'Chaar portal. Ek hi sach.',
   'landing.portals.sub': 'Har role ke liye alag console — students, kitchen, desk aur command centre — sab same live data padhte hain.',
@@ -210,11 +211,10 @@ export const hinglish6 = {
   'landing.cta.secondary': 'Staff sign in',
   'landing.cta.foot': 'HostelHub · One Platform, Smarter Hostel Living',
 
-  /* ---------- Footer branding ---------- */
-  'footer.institute': 'Medi-Caps University',
-  'footer.cohort': 'Cause ’26',
-  'footer.brandLine': 'Medi-Caps University | Cause ’26',
-  'footer.contactLine': 'Contact: Samyakthora@gmail.com | +91 9098088466',
+  /* ---------- Footer (brand + support) ---------- */
+  'footer.brandLine': 'HostelHub — Built for smarter hostel living',
+  'footer.portals': 'Portals',
+  'footer.support': 'Support',
 
   /* ---------- Management desk overview ---------- */
   'mgmt.pendingSub': 'approval ka wait',

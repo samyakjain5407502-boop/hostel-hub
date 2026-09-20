@@ -87,8 +87,12 @@ export const hi2 = {
 
   'footer.rights': 'सर्वाधिकार सुरक्षित।',
   'footer.madeFor': 'स्मार्ट हॉस्टल जीवन के लिए',
+  'footer.tagline2': 'कैम्पस-फर्स्ट संचालन बेहतर जीवन के लिए।',
+  'footer.campus': 'मेडी-कैप्स यूनिवर्सिटी · इंदौर',
   'footer.contact': 'संपर्क',
+  'footer.contactLine': 'हॉस्टल संचालन, सपोर्ट और ऑनबोर्डिंग के लिए उपलब्ध।',
   'footer.docs': 'सहायता और प्रश्न',
   'footer.privacy': 'गोपनीयता',
-  'footer.backToTop': 'ऊपर जाएँ'
+  'footer.backToTop': 'ऊपर जाएँ',
+  'nav.headcount': 'हेडकाउंट'
 } as const;

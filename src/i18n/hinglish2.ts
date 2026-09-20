@@ -87,8 +87,12 @@ export const hinglish2 = {
 
   'footer.rights': 'Sab rights reserved.',
   'footer.madeFor': 'Smart hostel living ke liye',
+  'footer.tagline2': 'Campus-first operations for better living.',
+  'footer.campus': 'Medi-Caps University · Indore',
   'footer.contact': 'Contact',
+  'footer.contactLine': 'Hostel operations, support aur onboarding ke liye available.',
   'footer.docs': 'Help & FAQs',
   'footer.privacy': 'Privacy',
-  'footer.backToTop': 'Upar jao'
+  'footer.backToTop': 'Upar jao',
+  'nav.headcount': 'Headcount'
 } as const;

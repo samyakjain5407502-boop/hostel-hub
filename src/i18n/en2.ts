@@ -87,7 +87,10 @@ export const en2 = {
 
   'footer.rights': 'All rights reserved.',
   'footer.madeFor': 'Built for smarter hostel living',
+  'footer.tagline2': 'Campus-first operations for better living.',
+  'footer.campus': 'Medi-Caps University · Indore',
   'footer.contact': 'Contact',
+  'footer.contactLine': 'Available for hostel operations, support and onboarding.',
   'footer.docs': 'Help & FAQs',
   'footer.privacy': 'Privacy',
   'footer.backToTop': 'Back to top'

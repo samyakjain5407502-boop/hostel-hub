@@ -15,6 +15,7 @@ export const hi6 = {
   'portal.admin': 'एडमिन कमांड',
   'portal.choose': 'अपना पोर्टल चुनें',
   'portal.chooseHint': 'चार पोर्टल, एक प्लेटफ़ॉर्म — जहाँ काम करते हैं वह चुनें।',
+  'portal.restricted': 'केवल अधिकृत स्टाफ के लिए',
 
   'nav.section.you': 'आपका हॉस्टल जीवन',
   'nav.section.mess': 'किचन काउंटर',
@@ -153,8 +154,8 @@ export const hi6 = {
   'admin.diagnostics': 'सिस्टम डायग्नोस्टिक्स',
   'admin.allHealthy': 'सभी सिस्टम स्वस्थ',
 
-  /* ---------- Landing (redesign) ---------- */
-  'landing.badge': 'मेडी-कैप्स यूनिवर्सिटी · Cause ’26',
+  /* ---------- Landing (brand) ---------- */
+  'landing.badge': 'मल्टी-टेनेंट हॉस्टल ऑपरेशन्स प्लेटफ़ॉर्म',
   'landing.hero.badge': 'अब 4 पोर्टल के साथ लाइव',
   'landing.hero.live': 'लाइव हेडकाउंट सक्रिय',
   'landing.hero.liveNow': 'अभी {n} लोग खा रहे हैं',
@@ -163,11 +164,11 @@ export const hi6 = {
   'landing.hero.ctaPrimary': 'छात्र पोर्टल खोलें',
   'landing.hero.ctaSecondary': 'सभी पोर्टल देखें',
   'landing.hero.note': 'डेमो डेटा शामिल · साइनअप नहीं · मोबाइल रेडी',
-  'landing.trust.title': 'कैंपस भर के हॉस्टल संचालन का भरोसा',
+  'landing.trust.title': 'नेटवर्क भर के हॉस्टल संचालन का भरोसा',
   'landing.trust.metric1': 'भोजन अपव्यय बचा',
   'landing.trust.metric2': 'इनाम बाँटे गए',
   'landing.trust.metric3': 'टिकट SLA पूरा',
-  'landing.trust.partners': 'विश्वविद्यालय हॉस्टल और ऑपरेटरों का भरोसा',
+  'landing.trust.partners': 'हॉस्टल और PG नेटवर्क का भरोसा',
   'landing.trust.metric4': 'इस टर्म में अपटाइम',
   'landing.portals.title': 'चार पोर्टल। एक ही सच।',
   'landing.portals.sub': 'हर भूमिका के लिए अलग कंसोल — छात्र, किचन, डेस्क और कमांड सेंटर — सब एक ही लाइव डेटा पढ़ते हैं।',
@@ -210,11 +211,10 @@ export const hi6 = {
   'landing.cta.secondary': 'स्टाफ साइन इन',
   'landing.cta.foot': 'HostelHub · One Platform, Smarter Hostel Living',
 
-  /* ---------- Footer branding ---------- */
-  'footer.institute': 'मेडी-कैप्स यूनिवर्सिटी',
-  'footer.cohort': 'Cause ’26',
-  'footer.brandLine': 'मेडी-कैप्स यूनिवर्सिटी | Cause ’26',
-  'footer.contactLine': 'संपर्क: Samyakthora@gmail.com | +91 9098088466',
+  /* ---------- Footer (brand + support) ---------- */
+  'footer.brandLine': 'HostelHub — बेहतर हॉस्टल लिविंग के लिए बनाया',
+  'footer.portals': 'पोर्टल',
+  'footer.support': 'सहायता',
 
   /* ---------- Management desk overview ---------- */
   'mgmt.pendingSub': 'स्वीकृति की प्रतीक्षा में',
