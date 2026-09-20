@@ -32,7 +32,12 @@ const PORTAL_AUTH: Record<Role, string> = {
 const LEGACY: Record<string, string> = {
   '/mess-operator': '/mess',
   '/admin/admissions': '/management/admissions',
-  '/admin/inventory': '/management/inventory'
+  '/admin/inventory': '/management/inventory',
+  '/admin/complaints': '/management/complaints',
+  '/admin/gatepass': '/management/gatepass',
+  '/admin/operators': '/management/operators',
+  '/admin/headcount': '/mess',
+  '/admin/menu': '/mess/menu'
 };
 
 export async function middleware(request: NextRequest) {

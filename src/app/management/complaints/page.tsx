@@ -1,3 +1,7 @@
+/**
+ * Management Desk → Complaint Triage (4-tier architecture → /management/complaints).
+ * Warden/manager reviews student complaints, assigns staff and watches SLA timers.
+ */
 'use client';
 
 import { Search, Users, CalendarClock, ArrowRight } from 'lucide-react';
@@ -22,7 +26,7 @@ const NEXT_STATUS: Record<ComplaintStatus, ComplaintStatus> = {
 
 const TECHS = ['R. Sharma (Electrician)', 'IT Cell — D. Bhatt', 'Housekeeping — Ganesh', 'Plumbing — S. Khan'];
 
-export default function AdminComplaints() {
+export default function ManagementComplaints() {
   const db = useDb();
   const { t } = useLang();
   const [q, setQ] = React.useState('');

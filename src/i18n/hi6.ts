@@ -5,6 +5,10 @@
 export const hi6 = {
   /* ---------- Portal names & shell navigation ---------- */
   'landing.hero.allPortals': 'सभी 4 पोर्टल',
+  'nav.section.operations': 'संचालन',
+  'nav.mgmtOperators': 'ऑपरेटर ऑनबोर्डिंग',
+  'nav.adminColleges': 'कॉलेज एवं अनुमोदन',
+  'nav.logsAdmin': 'सिस्टम लॉग',
   'portal.student': 'छात्र पोर्टल',
   'portal.operator': 'मेस ऑपरेटर',
   'portal.management': 'मैनेजमेंट डेस्क',

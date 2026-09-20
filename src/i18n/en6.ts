@@ -6,6 +6,10 @@
 export const en6 = {
   /* ---------- Portal names & shell navigation ---------- */
   'landing.hero.allPortals': 'All 4 Portals',
+  'nav.section.operations': 'Operations',
+  'nav.mgmtOperators': 'Operator Onboarding',
+  'nav.adminColleges': 'Colleges & Approvals',
+  'nav.logsAdmin': 'System Logs',
   'portal.student': 'Student Portal',
   'portal.operator': 'Mess Operator',
   'portal.management': 'Management Desk',

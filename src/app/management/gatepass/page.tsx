@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * Management Desk → Gate Pass verification (4-tier architecture → /management/gatepass).
+ * Wardens check student entries/exits and approve or decline exit requests.
+ */
+
 import { motion } from 'framer-motion';
 import { Users, QrCode, Clock, CheckCircle, X } from 'lucide-react';
 import * as React from 'react';
@@ -12,7 +17,7 @@ import { useToast } from '@/components/ui/toast';
 import { PassCode } from '@/components/gatepass/pass-code';
 import { cn, timeAgo } from '@/lib/utils';
 
-export default function AdminGatePassPage() {
+export default function ManagementGatePassPage() {
   const db = useDb();
   const { t, n } = useLang();
   const toast = useToast();

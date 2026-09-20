@@ -4,7 +4,7 @@
  * Mess Operator portal login (3-portal architecture → /auth/mess).
  * Demo credentials: Operator ID `OPS-2001` · Passkey `224488`.
  * Operator accounts are provisioned by the Super-Admin via
- * `/admin/operators` onboarding.
+ * `/management/operators` onboarding.
  */
 
 import { KeyRound, BadgeCheck, Fingerprint, ShieldAlert, ChefHat } from 'lucide-react';

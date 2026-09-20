@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Super-Admin → Mess Operator onboarding (3-portal architecture → /admin/operators).
- * Provisioning demo: approves operator accounts (in production this writes to the
+ * Management Desk → Operator onboarding (4-tier architecture → /management/operators).
+ * Adds and manages mess & hostel staff members (in production this writes to the
  * operators table and emails credentials).
  */
 
@@ -26,7 +26,7 @@ const SEED_REQUESTS: OperatorRequest[] = [
   { id: 'REQ-102', name: 'Priya Kulkarni', college: 'Arts & Science College', requestedAt: Date.now() - 5 * 3600_000 }
 ];
 
-export default function AdminOperatorsPage() {
+export default function ManagementOperatorsPage() {
   const toast = useToast();
   const [requests, setRequests] = React.useState<OperatorRequest[]>([]);
   const [ready, setReady] = React.useState(false);

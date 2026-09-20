@@ -2,8 +2,8 @@
 
 import {
   LayoutDashboard, UtensilsCrossed, Star, LifeBuoy, Gift, Trophy, Wallet,
-  Users, Utensils, KanbanSquare, Radar, X, Receipt, QrCode, Grid3x3, UserPlus,
-  Building2, UserCog, ScrollText, ChefHat, Leaf, ClipboardList, BarChart3,
+  KanbanSquare, Radar, X, Receipt, QrCode, Grid3x3, UserPlus, Utensils,
+  Building2, UserCog, ScrollText, ChefHat, ClipboardList, BarChart3, Landmark,
   type LucideIcon
 } from 'lucide-react';
 import * as React from 'react';
@@ -78,6 +78,14 @@ const MANAGEMENT_NAV: NavGroup[] = [
     ]
   },
   {
+    section: 'nav.section.operations',
+    items: [
+      { href: '/management/complaints', key: 'nav.complaintsAdmin', icon: KanbanSquare, live: true },
+      { href: '/management/gatepass', key: 'nav.gatepass', icon: QrCode },
+      { href: '/management/operators', key: 'nav.mgmtOperators', icon: UserCog }
+    ]
+  },
+  {
     section: 'nav.section.management',
     items: [
       { href: '/management/inventory', key: 'nav.mgmtInventory', icon: Grid3x3 },
@@ -91,25 +99,10 @@ const ADMIN_NAV: NavGroup[] = [
     items: [
       { href: '/admin', key: 'admin.title', icon: LayoutDashboard },
       { href: '/admin/branches', key: 'nav.adminBranches', icon: Building2 },
+      { href: '/admin/colleges', key: 'nav.adminColleges', icon: Landmark },
       { href: '/admin/analytics', key: 'nav.adminAnalytics', icon: BarChart3, live: true },
-      { href: '/admin/rewards', key: 'nav.rewardsAdmin', icon: Radar }
-    ]
-  },
-  {
-    section: 'nav.section.mess',
-    items: [
-      { href: '/admin/headcount', key: 'nav.headcountAdmin', icon: Users },
-      { href: '/admin/menu', key: 'nav.menuAdmin', icon: Utensils }
-    ]
-  },
-  {
-    section: 'nav.section.admin',
-    items: [
-      { href: '/admin/complaints', key: 'nav.complaintsAdmin', icon: KanbanSquare },
-      { href: '/admin/gatepass', key: 'nav.gatepass', icon: QrCode },
-      { href: '/admin/operators', label: 'Operator Onboarding', icon: UserCog },
-      { href: '/admin/colleges', label: 'Colleges & Approvals', icon: Leaf },
-      { href: '/admin/logs', label: 'System Logs', icon: ScrollText }
+      { href: '/admin/rewards', key: 'nav.rewardsAdmin', icon: Radar },
+      { href: '/admin/logs', key: 'nav.logsAdmin', icon: ScrollText }
     ]
   }
 ];

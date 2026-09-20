@@ -5,6 +5,10 @@
 export const hinglish6 = {
   /* ---------- Portal names & shell navigation ---------- */
   'landing.hero.allPortals': 'Saare 4 Portals',
+  'nav.section.operations': 'Operations',
+  'nav.mgmtOperators': 'Operator onboarding',
+  'nav.adminColleges': 'Colleges & approvals',
+  'nav.logsAdmin': 'System logs',
   'portal.student': 'Student Portal',
   'portal.operator': 'Mess Operator',
   'portal.management': 'Management Desk',
