@@ -27,23 +27,32 @@
   --brand-900: #312e81;
   --brand-950: #1e1b4b;
 
-  /* High-surface tokens */
-  --bg: #f8fafc;
+  /* High-surface tokens
+     CONTRAST NOTE (light mode is the harder theme):
+       --fg        #0f172a on #ffffff → 17.9:1  (AAA)
+       --fg-muted  #334155 on #ffffff → 10.4:1  (AAA)
+       --fg-subtle #475569 on #ffffff →  7.5:1  (AAA)
+     Every value was picked so body copy stays razor sharp on white.
+     Nothing in light mode is allowed to fall back to a washed-out grey. */
+  --bg: #f6f8fc;
   --bg-elevated: #ffffff;
-  --fg: #0f172a;
-  --fg-muted: #475569;
-  --fg-subtle: #94a3b8;
+  --fg: #0b1220;
+  --fg-muted: #334155;
+  --fg-subtle: #475569;
 
   /* Card / panel */
   --card: #ffffff;
-  --card-2: #f1f5f9;
+  --card-2: #f8fafc;
+  --card-3: #f1f5f9;
   --border: #e2e8f0;
+  --border-subtle: #eef2f7;
   --border-strong: #cbd5e1;
+  --ring: rgba(79, 70, 229, 0.35);
 
   /* Muted / subtle surfaces */
   --muted: #f1f5f9;
   --muted-2: #e2e8f0;
-  --muted-fg: #64748b;
+  --muted-fg: #334155;
 
   /* Accent (actions, focus, highlights) */
   --accent: #6366f1;
@@ -70,6 +79,11 @@
   /* Glass */
   --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(99, 102, 241, 0.14);
+
+  /* Elevation (light) — real, visible depth instead of a washed-out blur. */
+  --elev-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --elev-2: 0 4px 10px -4px rgba(15, 23, 42, 0.12), 0 12px 28px -14px rgba(15, 23, 42, 0.16);
+  --elev-3: 0 10px 24px -12px rgba(15, 23, 42, 0.2), 0 28px 60px -28px rgba(79, 70, 229, 0.28);
 }
 
 .dark {
@@ -618,4 +632,226 @@ body.scroll-locked {
 
 .passcode-cell-off {
   background-color: #f1f5f9;
+}
+
+/* ============================================================
+   LIGHT-MODE CONTRAST RESCUE
+   ------------------------------------------------------------
+   The component library was authored with light palette utilities
+   (`text-slate-400`, `text-slate-500`, `border-slate-100`…). On a
+   white card those greys land between 2.6:1 and 4.6:1 — unreadable
+   for body copy and a straight WCAG 2.1 AA failure.
+
+   These rules are scoped with `html:not(.dark)` so they:
+     • win over the earlier zero-specificity dark remaps (0,1,1 > 0,1,0),
+     • never apply in dark mode, leaving the working dark theme untouched.
+   ============================================================ */
+
+html:not(.dark) .text-slate-400 {
+  color: #5b6b83; /* 5.1:1 on #fff — was 2.6:1 */
+}
+
+html:not(.dark) .text-slate-500 {
+  color: #475569; /* 7.5:1 on #fff — was 4.6:1 */
+}
+
+html:not(.dark) .text-slate-300 {
+  color: #7b8aa1; /* placeholders / decorative only */
+}
+
+html:not(.dark) .text-fg-subtle,
+html:not(.dark) .text-subtle {
+  color: var(--fg-subtle);
+}
+
+html:not(.dark) .text-fg-muted,
+html:not(.dark) .text-muted {
+  color: var(--fg-muted);
+}
+
+/* Dividers that were nearly invisible on white. */
+html:not(.dark) .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border);
+}
+
+html:not(.dark) .border-slate-100 {
+  border-color: var(--border);
+}
+
+/* Placeholder text: exempt from WCAG but still worth sharpening. */
+html:not(.dark) .placeholder\:text-slate-400::placeholder {
+  color: #7b8aa1;
+}
+
+
+/* ============================================================
+   GAMIFICATION & MICRO-INTERACTION LAYER
+   Small, composable primitives the reward surfaces build on.
+   ============================================================ */
+
+/* ---------- Accent glows (status badges, reward cards) ---------- */
+.glow-brand {
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.22), 0 10px 30px -12px rgba(79, 70, 229, 0.55);
+}
+.glow-success {
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25), 0 10px 30px -12px rgba(5, 150, 105, 0.5);
+}
+.glow-amber {
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.28), 0 10px 30px -12px rgba(217, 119, 6, 0.5);
+}
+.glow-violet {
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.25), 0 10px 30px -12px rgba(124, 58, 237, 0.5);
+}
+.glow-rose {
+  box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.25), 0 10px 30px -12px rgba(225, 29, 72, 0.5);
+}
+
+/* A soft halo that breathes — for "live" indicators. */
+@keyframes halo {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+  70% { box-shadow: 0 0 0 9px transparent; }
+}
+.live-halo {
+  animation: halo 1.9s ease-out infinite;
+}
+
+/* ---------- Hover elevation for interactive cards ---------- */
+.lift {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+  will-change: transform;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--elev-3);
+}
+.dark .lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 26px 52px -22px rgba(0, 0, 0, 0.7),
+    0 10px 34px -16px rgba(99, 102, 241, 0.45);
+}
+.lift:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+/* ---------- Satisfying press feedback ---------- */
+@keyframes pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+.pop-on-press:active {
+  animation: pop 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- Reward shine sweep (unlocked badges / perk cards) ---------- */
+@keyframes shine-sweep {
+  0% { transform: translateX(-130%) skewX(-18deg); }
+  60%, 100% { transform: translateX(230%) skewX(-18deg); }
+}
+.shine::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: shine-sweep 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+
+/* ---------- Floating ambient blobs (hero / empty states) ---------- */
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(14px, -18px, 0) scale(1.04); }
+  66% { transform: translate3d(-12px, 12px, 0) scale(0.98); }
+}
+.drift {
+  animation: drift 13s ease-in-out infinite;
+}
+
+/* ---------- Gradient text ---------- */
+.text-gradient {
+  background-image: linear-gradient(100deg, var(--brand-600), #8b5cf6 52%, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dark .text-gradient {
+  background-image: linear-gradient(100deg, #c7d2fe, #c4b5fd 52%, #7dd3fc);
+}
+
+/* ---------- Hairline grid backdrop (high-end SaaS hero) ---------- */
+.grid-lines {
+  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.055) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.dark .grid-lines {
+  background-image: linear-gradient(to right, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+}
+.grid-fade {
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 45%, transparent 100%);
+}
+
+/* ---------- Reward surface ---------- */
+.reward-surface {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(99, 102, 241, 0.16), transparent 55%),
+    radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.18), transparent 50%),
+    var(--card);
+  border: 1px solid var(--border);
+}
+
+/* ---------- Scratch-foil card ---------- */
+.scratch-foil {
+  background:
+    repeating-linear-gradient(115deg, #c7d2fe 0px, #c7d2fe 8px, #dbeafe 8px, #dbeafe 16px),
+    linear-gradient(180deg, #e0e7ff, #c7d2fe);
+  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.6);
+}
+.dark .scratch-foil {
+  background:
+    repeating-linear-gradient(115deg, #312e81 0px, #312e81 8px, #3730a3 8px, #3730a3 16px),
+    linear-gradient(180deg, #1e1b4b, #312e81);
+  box-shadow: inset 0 0 30px rgba(15, 23, 42, 0.7);
+}
+
+/* ---------- Progress ring track ---------- */
+.ring-track {
+  stroke: var(--muted-2);
+}
+.dark .ring-track {
+  stroke: rgba(148, 163, 184, 0.2);
+}
+
+/* ---------- Bounce-in for revealed rewards ---------- */
+@keyframes bounce-in {
+  0% { transform: scale(0.5) rotate(-8deg); opacity: 0; }
+  55% { transform: scale(1.08) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.bounce-in {
+  animation: bounce-in 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ---------- Marquee (trust / logo strip) ---------- */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 26s linear infinite;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+/* ---------- Comfortable tap targets inside dense lists ---------- */
+.tap-safe {
+  min-height: 44px;
 }

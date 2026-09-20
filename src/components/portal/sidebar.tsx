@@ -3,7 +3,8 @@
 import {
   LayoutDashboard, UtensilsCrossed, Star, LifeBuoy, Gift, Trophy, Wallet,
   Users, Utensils, KanbanSquare, Radar, X, Receipt, QrCode, Grid3x3, UserPlus,
-  Building2, UserCog, ScrollText, ChefHat
+  Building2, UserCog, ScrollText, ChefHat, Leaf, ClipboardList, BarChart3,
+  type LucideIcon
 } from 'lucide-react';
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -15,48 +16,115 @@ import type { Role } from '@/types';
 
 interface NavItem {
   href: string;
-  /** i18n key — omit and set `label` for plain-text items (operator/admin consoles). */
+  /** i18n key — omit and set `label` for plain-text items. */
   key?: TKey;
   label?: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
+  /** Renders a small pulse dot (live surfaces). */
+  live?: boolean;
 }
 
-const STUDENT_NAV: NavItem[] = [
-  { href: '/dashboard', key: 'nav.dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/mess', key: 'nav.mess', icon: UtensilsCrossed },
-  { href: '/dashboard/plate', key: 'nav.plate', icon: Utensils },
-  { href: '/dashboard/rate', key: 'nav.rating', icon: Star },
-  { href: '/dashboard/complaints', key: 'nav.complaints', icon: LifeBuoy },
-  { href: '/dashboard/rewards', key: 'nav.rewards', icon: Gift },
-  { href: '/dashboard/leaderboard', key: 'nav.leaderboard', icon: Trophy },
-  { href: '/dashboard/wallet', key: 'nav.wallet', icon: Wallet },
-  { href: '/dashboard/ledger', key: 'nav.ledger', icon: Receipt },
-  { href: '/dashboard/gatepass', key: 'nav.gatepass', icon: QrCode }
+/** Optional heading inside a portal rail. */
+interface NavGroup {
+  section?: TKey;
+  items: NavItem[];
+}
+
+const STUDENT_NAV: NavGroup[] = [
+  {
+    items: [
+      { href: '/dashboard', key: 'nav.dashboard', icon: LayoutDashboard },
+      { href: '/dashboard/mess', key: 'nav.mess', icon: UtensilsCrossed, live: true },
+      { href: '/dashboard/plate', key: 'nav.plate', icon: Utensils },
+      { href: '/dashboard/rate', key: 'nav.rating', icon: Star }
+    ]
+  },
+  {
+    section: 'nav.section.you',
+    items: [
+      { href: '/dashboard/rewards', key: 'nav.rewards', icon: Gift },
+      { href: '/dashboard/leaderboard', key: 'nav.leaderboard', icon: Trophy },
+      { href: '/dashboard/wallet', key: 'nav.wallet', icon: Wallet }
+    ]
+  },
+  {
+    section: 'nav.section.management',
+    items: [
+      { href: '/dashboard/ledger', key: 'nav.ledger', icon: Receipt },
+      { href: '/dashboard/gatepass', key: 'nav.gatepass', icon: QrCode },
+      { href: '/dashboard/complaints', key: 'nav.complaints', icon: LifeBuoy }
+    ]
+  }
 ];
 
-const ADMIN_NAV: NavItem[] = [
-  { href: '/admin', key: 'admin.title', icon: LayoutDashboard },
-  { href: '/admin/headcount', key: 'nav.headcountAdmin', icon: Users },
-  { href: '/admin/colleges', label: 'Colleges & Hostels', icon: Building2 },
-  { href: '/admin/operators', label: 'Operator Onboarding', icon: UserCog },
-  { href: '/admin/inventory', key: 'nav.inventory', icon: Grid3x3 },
-  { href: '/admin/admissions', key: 'nav.admissions', icon: UserPlus },
-  { href: '/admin/menu', key: 'nav.menuAdmin', icon: Utensils },
-  { href: '/admin/complaints', key: 'nav.complaintsAdmin', icon: KanbanSquare },
-  { href: '/admin/gatepass', key: 'nav.gatepass', icon: QrCode },
-  { href: '/admin/rewards', key: 'nav.rewardsAdmin', icon: Radar },
-  { href: '/admin/logs', label: 'System Logs', icon: ScrollText }
+
+const OPERATOR_NAV: NavGroup[] = [
+  {
+    items: [
+      { href: '/mess', key: 'nav.messConsole', icon: ChefHat, live: true },
+      { href: '/mess/menu', key: 'nav.messMenu', icon: UtensilsCrossed },
+      { href: '/mess/ingredients', key: 'nav.messIngredients', icon: ClipboardList }
+    ]
+  }
 ];
 
-const OPERATOR_NAV: NavItem[] = [
-  { href: '/mess-operator', label: 'Operator Console', icon: ChefHat }
+const MANAGEMENT_NAV: NavGroup[] = [
+  {
+    items: [
+      { href: '/management', key: 'nav.mgmtDashboard', icon: LayoutDashboard },
+      { href: '/management/admissions', key: 'nav.mgmtAdmissions', icon: UserPlus },
+      { href: '/management/walkin', key: 'nav.mgmtWalkin', icon: ClipboardList }
+    ]
+  },
+  {
+    section: 'nav.section.management',
+    items: [
+      { href: '/management/inventory', key: 'nav.mgmtInventory', icon: Grid3x3 },
+      { href: '/management/invoices', key: 'nav.mgmtInvoices', icon: Receipt }
+    ]
+  }
 ];
+
+const ADMIN_NAV: NavGroup[] = [
+  {
+    items: [
+      { href: '/admin', key: 'admin.title', icon: LayoutDashboard },
+      { href: '/admin/branches', key: 'nav.adminBranches', icon: Building2 },
+      { href: '/admin/analytics', key: 'nav.adminAnalytics', icon: BarChart3, live: true },
+      { href: '/admin/rewards', key: 'nav.rewardsAdmin', icon: Radar }
+    ]
+  },
+  {
+    section: 'nav.section.mess',
+    items: [
+      { href: '/admin/headcount', key: 'nav.headcountAdmin', icon: Users },
+      { href: '/admin/menu', key: 'nav.menuAdmin', icon: Utensils }
+    ]
+  },
+  {
+    section: 'nav.section.admin',
+    items: [
+      { href: '/admin/complaints', key: 'nav.complaintsAdmin', icon: KanbanSquare },
+      { href: '/admin/gatepass', key: 'nav.gatepass', icon: QrCode },
+      { href: '/admin/operators', label: 'Operator Onboarding', icon: UserCog },
+      { href: '/admin/colleges', label: 'Colleges & Approvals', icon: Leaf },
+      { href: '/admin/logs', label: 'System Logs', icon: ScrollText }
+    ]
+  }
+];
+
+const NAV: Record<Role, NavGroup[]> = {
+  student: STUDENT_NAV,
+  operator: OPERATOR_NAV,
+  management: MANAGEMENT_NAV,
+  admin: ADMIN_NAV
+};
 
 export function Sidebar({ role, pathname, open, onClose }: {
   role: Role; pathname: string; open: boolean; onClose: () => void;
 }) {
   const { t } = useLang();
-  const nav = role === 'admin' ? ADMIN_NAV : role === 'operator' ? OPERATOR_NAV : STUDENT_NAV;
+  const nav = NAV[role];
   const home = PORTAL_HOME[role];
 
   /* Escape closes the drawer — keyboard parity with tapping the backdrop. */
@@ -74,10 +142,10 @@ export function Sidebar({ role, pathname, open, onClose }: {
       {/* Desktop rail — sticky and independently scrollable so a long nav
           never stretches the page or hangs past the viewport. */}
       <aside
-        className="sticky top-[4.5rem] hidden max-h-[calc(100dvh-6rem)] w-60 shrink-0 flex-col gap-1 overflow-y-auto p-3 lg:flex"
+        className="sticky top-[4.5rem] hidden max-h-[calc(100dvh-6rem)] w-64 shrink-0 flex-col gap-1 overflow-y-auto p-3 lg:flex"
         aria-label={t('a11y.primaryNav')}
       >
-        <NavList nav={nav} t={t} pathname={pathname} />
+        <NavList groups={nav} t={t} pathname={pathname} />
       </aside>
 
       {/* Mobile / tablet: full-bleed slide-over drawer */}
@@ -124,7 +192,7 @@ export function Sidebar({ role, pathname, open, onClose }: {
               </div>
 
               <div className="safe-bottom min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-3">
-                <NavList nav={nav} t={t} pathname={pathname} onClick={onClose} />
+                <NavList groups={nav} t={t} pathname={pathname} onClick={onClose} />
               </div>
             </motion.aside>
           </div>
@@ -134,35 +202,51 @@ export function Sidebar({ role, pathname, open, onClose }: {
   );
 }
 
-function NavList({ nav, t, pathname, onClick }: {
-  nav: NavItem[]; t: (k: TKey) => string; pathname: string; onClick?: () => void;
+function NavList({ groups, t, pathname, onClick }: {
+  groups: NavGroup[]; t: (k: TKey) => string; pathname: string; onClick?: () => void;
 }) {
   return (
     <nav className="flex w-full max-w-full flex-col gap-1">
-      {nav.map((item) => {
-        const active = pathname === item.href;
-        const Icon = item.icon;
-        return (
-          <a
-            key={item.href}
-            href={item.href}
-            onClick={onClick}
-            aria-current={active ? 'page' : undefined}
-            className={cn(
-              'flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
-              active
-                ? 'bg-brand-100 text-brand-800 shadow-soft'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
-            )}
-          >
-            <Icon className={cn('h-4.5 w-4.5 shrink-0', active ? 'text-brand-600' : 'text-slate-400')} aria-hidden="true" />
-            <span className="min-w-0 flex-1 truncate">{item.key ? t(item.key) : item.label}</span>
-            {active && (
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-600" aria-hidden="true" />
-            )}
-          </a>
-        );
-      })}
+      {groups.map((group, gi) => (
+        <div key={group.section ?? `g${gi}`} className="flex flex-col gap-1">
+          {group.section && (
+            <p className="mt-3 px-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+              {t(group.section)}
+            </p>
+          )}
+          {group.items.map((item) => {
+            const active = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={onClick}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'group flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                  active
+                    ? 'bg-brand-100 font-semibold text-brand-800 shadow-soft'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'h-[18px] w-[18px] shrink-0 transition',
+                    active ? 'text-brand-600' : 'text-slate-500 group-hover:text-brand-600'
+                  )}
+                  aria-hidden="true"
+                />
+                <span className="min-w-0 flex-1 truncate">{item.key ? t(item.key) : item.label}</span>
+                {item.live && !active && (
+                  <span className="live-halo h-1.5 w-1.5 shrink-0 rounded-full bg-success-500 text-success-500" aria-hidden="true" />
+                )}
+                {active && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-600" aria-hidden="true" />}
+              </a>
+            );
+          })}
+        </div>
+      ))}
     </nav>
   );
 }

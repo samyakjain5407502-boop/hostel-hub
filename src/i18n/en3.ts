@@ -10,7 +10,7 @@ export const en3 = {
   'landing.hero.titleA': 'One Platform,',
   'landing.hero.titleHi': 'Smarter',
   'landing.hero.titleB': 'Hostel Living',
-  'landing.hero.sub': 'Plan your mess meals, earn eco & discipline points, and get every complaint fixed — all from your phone.',
+  'landing.hero.sub': 'Mess planning that cuts waste, gamified rewards students actually chase, real-time kitchen headcount and fee automation — one platform, four portals.',
   'landing.hero.chip1': 'Mess credits & opt-in',
   'landing.hero.chip2': 'Reward gift boxes',
   'landing.hero.chip3': 'Live headcount',

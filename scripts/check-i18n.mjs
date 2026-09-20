@@ -33,9 +33,9 @@ function group(prefixes) {
 }
 
 const locales = {
-  en: ['en.ts', 'en2.ts', 'en3.ts', 'en4.ts', 'en5.ts'],
-  hi: ['hi.ts', 'hi2.ts', 'hi3.ts', 'hi4.ts', 'hi5.ts'],
-  hinglish: ['hinglish.ts', 'hinglish2.ts', 'hinglish3.ts', 'hinglish4.ts', 'hinglish5.ts']
+  en: ['en.ts', 'en2.ts', 'en3.ts', 'en4.ts', 'en5.ts', 'en6.ts'],
+  hi: ['hi.ts', 'hi2.ts', 'hi3.ts', 'hi4.ts', 'hi5.ts', 'hi6.ts'],
+  hinglish: ['hinglish.ts', 'hinglish2.ts', 'hinglish3.ts', 'hinglish4.ts', 'hinglish5.ts', 'hinglish6.ts']
 };
 
 let failed = false;
@@ -83,7 +83,8 @@ for (const [lang, { keys }] of Object.entries(resolved)) {
 }
 
 // Catch unreadable dictionaries in the barrel files list.
-const barrels = readdirSync(DIR).filter((f) => /^[a-z0-9]+\.ts$/.test(f));
+// `index.ts` is the public barrel (not a dictionary) so it is excluded.
+const barrels = readdirSync(DIR).filter((f) => /^[a-z0-9]+\.ts$/.test(f) && f !== 'index.ts');
 for (const f of barrels) {
   if (!Object.values(locales).flat().includes(f)) {
     failed = true;

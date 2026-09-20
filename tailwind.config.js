@@ -111,12 +111,16 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-fallback)', 'ui-rounded', 'sans-serif']
+        sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        display: ['var(--font-inter)', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif']
       },
       boxShadow: {
         soft: '0 10px 30px -12px rgba(79,70,229,0.18)',
-        lift: '0 4px 14px rgba(15,23,42,0.08)'
+        lift: '0 1px 2px rgba(15,23,42,0.06), 0 4px 14px -6px rgba(15,23,42,0.12)',
+        ring: '0 0 0 4px rgba(99,102,241,0.14)'
+      },
+      backgroundImage: {
+        'brand-gradient': 'linear-gradient(100deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%)'
       },
       borderRadius: {
         xl2: '1.75rem'
@@ -125,10 +129,25 @@ module.exports = {
         'glow-pulse': {
           '0%, 100%': { boxShadow: '0 0 0 0 rgba(16,185,129,0.55)' },
           '50%': { boxShadow: '0 0 0 14px rgba(16,185,129,0)' }
+        },
+        'float-y': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-6px)' }
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' }
+        },
+        'slide-up': {
+          from: { opacity: '0', transform: 'translateY(10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' }
         }
       },
       animation: {
-        'glow-pulse': 'glow-pulse 2s ease-in-out infinite'
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'float-y': 'float-y 3.4s ease-in-out infinite',
+        'fade-in': 'fade-in .22s ease-out both',
+        'slide-up': 'slide-up .34s cubic-bezier(.22,1,.36,1) both'
       }
     }
   },

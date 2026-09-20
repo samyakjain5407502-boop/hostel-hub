@@ -78,8 +78,10 @@ export { COOKIE };
    6-digit code per session (see `src/lib/otp.ts` + `<OtpBanner />`). */
 export const DEMO_STUDENT = { id: 'STU-23045', password: 'hostelhub' };
 export const DEMO_ADMIN = { id: 'FAC-1001', key: 'HUB-2026', passkey: '447102' };
-/** Mess Operator portal (3-portal architecture) — demo counter credentials. */
+/** Mess Operator portal — demo counter credentials. */
 export const DEMO_OPERATOR = { id: 'OPS-2001', passkey: '224488' };
+/** Management desk portal — demo warden/desk credentials. */
+export const DEMO_MANAGER = { id: 'MGT-3001', key: 'DESK-2026', passkey: '776611' };
 
 export function demoStudentUser(college?: College | null, mobile?: string): User {
   return {
@@ -98,4 +100,7 @@ export function demoAdminUser(): User {
 }
 export function demoOperatorUser(): User {
     return { id: DEMO_OPERATOR.id, name: 'Sunil Kitchen Lead', role: 'operator', email: 'operator@hostelhub.app', avatarHue: 20 };
+}
+export function demoManagerUser(): User {
+    return { id: DEMO_MANAGER.id, name: 'Neha Warden', role: 'management', email: 'desk@hostelhub.app', avatarHue: 300 };
 }

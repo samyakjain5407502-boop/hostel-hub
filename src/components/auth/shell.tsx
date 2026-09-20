@@ -5,12 +5,13 @@ import { ArrowRight, LoaderCircle } from 'lucide-react';
 import * as React from 'react';
 import { LogoMark } from '@/components/brand';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { ThemeToggle } from '@/components/theme/toggle';
 import { Footer } from '@/components/footer';
 import { cn } from '@/lib/utils';
 import { useLang } from '@/i18n';
 
 export interface AuthConfig {
-  role: 'student' | 'operator' | 'admin';
+  role: 'student' | 'operator' | 'management' | 'admin';
   title: string;
   sub: string;
   accentRing: string;
@@ -25,10 +26,13 @@ export function AuthShell({ config, children }: { config: AuthConfig; children: 
           <LogoMark />
           <span className="truncate font-display text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">Hostel<span className="text-brand-600">Hub</span></span>
         </a>
-        <LanguageSwitcher />
+        <div className="flex shrink-0 items-center gap-2">
+          <ThemeToggle />
+          <LanguageSwitcher />
+        </div>
       </div>
 
-      <div id="main" className="mx-auto grid w-full max-w-5xl items-center gap-10 px-4 pb-16 sm:px-5 lg:grid-cols-2">
+      <div id="main" className="mx-auto grid w-full max-w-5xl items-center gap-10 px-4 pb-16 pt-6 sm:px-5 lg:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
@@ -44,16 +48,16 @@ export function AuthShell({ config, children }: { config: AuthConfig; children: 
           transition={{ duration: 0.5, delay: 0.1 }}
           className="order-1 hidden lg:order-2 lg:flex lg:flex-col"
         >
-          <div className={cn('mx-auto grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br text-white shadow-soft', config.accentRing)}>
+          <div className={cn('glow-brand mx-auto grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br text-white', config.accentRing)}>
             {config.icon}
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">{config.title}</h1>
-          <p className="mt-2 text-slate-500">{config.sub}</p>
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900">{config.title}</h1>
+          <p className="mt-2 text-slate-600">{config.sub}</p>
 
-          <ul className="mt-8 space-y-4 text-sm text-slate-600">
-            {['Mess planning & credits', 'Rewards & gift boxes', 'Live complaint tracking', 'Meal quality rating'].map((x, i) => (
-              <li key={x} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white/80 px-3.5 py-3">
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">{i + 1}</span>
+          <ul className="mt-8 space-y-3.5 text-sm font-medium text-slate-700">
+            {PORTAL_HIGHLIGHTS[config.role].map((x, i) => (
+              <li key={x} className="lift flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 shadow-lift">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">{i + 1}</span>
                 {x}
               </li>
             ))}
@@ -64,6 +68,14 @@ export function AuthShell({ config, children }: { config: AuthConfig; children: 
     </div>
   );
 }
+
+/** Per-portal "what you get" list on the auth hero panel. */
+const PORTAL_HIGHLIGHTS: Record<AuthConfig['role'], string[]> = {
+  student: ['Mess plate customisation', 'Rewards & scratch cards', 'Fee ledger and gate pass QR', 'Live complaint tracking'],
+  operator: ['Live opted-in headcount', 'Meal slot Active / Closed switch', 'Ingredient calculator per head', 'QR plate verification'],
+  management: ['Application verification queue', 'Walk-in admission desk', 'Room & bed inventory matrix', 'Fee invoice generation'],
+  admin: ['Multi-property branch setup', 'Occupancy & wastage BI', 'Global reward engine', 'System diagnostic logs']
+};
 
 export function Spin({ className }: { className?: string }) {
   return <LoaderCircle className={cn('h-5 w-5 animate-spin', className)} aria-hidden="true" />;

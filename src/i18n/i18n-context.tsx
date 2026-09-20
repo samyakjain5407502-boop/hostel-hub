@@ -7,16 +7,19 @@ import { en2 } from './en2';
 import { en3 } from './en3';
 import { en4 } from './en4';
 import { en5 } from './en5';
+import { en6 } from './en6';
 import { hi } from './hi';
 import { hi2 } from './hi2';
 import { hi3 } from './hi3';
 import { hi4 } from './hi4';
 import { hi5 } from './hi5';
+import { hi6 } from './hi6';
 import { hinglish } from './hinglish';
 import { hinglish2 } from './hinglish2';
 import { hinglish3 } from './hinglish3';
 import { hinglish4 } from './hinglish4';
 import { hinglish5 } from './hinglish5';
+import { hinglish6 } from './hinglish6';
 
 export type Lang = 'en' | 'hi' | 'hinglish';
 
@@ -34,9 +37,9 @@ export const LANG_LABELS: Record<Lang, { label: string; native: string; flag: st
  * English defines the canonical key set â€” `Dict` forces every locale to
  * implement all of it, so a missing Hindi label fails the type-check.
  */
-const enAll = { ...en, ...en2, ...en3, ...en4, ...en5 };
-const hiAll = { ...hi, ...hi2, ...hi3, ...hi4, ...hi5 };
-const hinglishAll = { ...hinglish, ...hinglish2, ...hinglish3, ...hinglish4, ...hinglish5 };
+const enAll = { ...en, ...en2, ...en3, ...en4, ...en5, ...en6 };
+const hiAll = { ...hi, ...hi2, ...hi3, ...hi4, ...hi5, ...hi6 };
+const hinglishAll = { ...hinglish, ...hinglish2, ...hinglish3, ...hinglish4, ...hinglish5, ...hinglish6 };
 
 export type TKey = keyof typeof enAll;
 export type Dict = Record<TKey, string>;

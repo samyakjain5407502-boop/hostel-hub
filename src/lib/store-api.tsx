@@ -1,7 +1,7 @@
 'use client';
 
 import type {
-  ApplicationStatus, BedStatus, Branch, Complaint, ComplaintStatus, GatePass, GatePassStatus, OwnerProfile,
+  ApplicationStatus, BedStatus, Branch, Complaint, ComplaintStatus, GatePass, GatePassStatus, Meal, OwnerProfile,
   RateStats, RewardTxn, RoomBed, StudentApplication, TokenBooking, PlateSelection, FeeInvoice
 } from '@/types';
 import { hashId } from '@/lib/utils';
@@ -106,6 +106,19 @@ export function buildApi(
         items[index] = next.name;
         return { ...m, items, menuMeta: meta };
       })
+    }));
+    commit({ ...db, week });
+  }
+
+  /**
+   * Mess Operator "Instant meal status": flip a slot between Active (open for
+   * service) and Closed. Students see the change immediately on their plate
+   * and mess screens because the store is shared.
+   */
+  function setMealStatus(mealId: string, status: Meal['status']) {
+    const week = db.week.map((day) => ({
+      ...day,
+      meals: day.meals.map((m) => (m.id === mealId ? { ...m, status } : m))
     }));
     commit({ ...db, week });
   }
@@ -398,7 +411,7 @@ export function buildApi(
   }
 
   return {
-    ...db, optMeal, rateMeal, addComplaint, upvoteComplaint, votePoll, updateMenuItem,
+    ...db, optMeal, rateMeal, addComplaint, upvoteComplaint, votePoll, updateMenuItem, setMealStatus,
     scratchGift, claimPerk, markRead, setComplaintStatus, broadcast,
     adjustPoll, addPollOption, resetDemo,
     registerOwner, registerBranch, toggleSponsor,

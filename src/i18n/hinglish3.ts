@@ -7,7 +7,7 @@ export const hinglish3 = {
   'landing.hero.titleA': 'Ek Platform,',
   'landing.hero.titleHi': 'Smarter',
   'landing.hero.titleB': 'Hostel Living',
-  'landing.hero.sub': 'Mess ka khana plan karo, eco aur discipline points kamao, aur har complaint time pe fix karwao — sab phone se.',
+  'landing.hero.sub': 'Mess planning jo waste kaate, gamified rewards sabko pasand, real-time kitchen headcount aur fee automation — ek platform, chaar portal.',
   'landing.hero.chip1': 'Mess credits aur opt-in',
   'landing.hero.chip2': 'Reward gift boxes',
   'landing.hero.chip3': 'Live headcount',

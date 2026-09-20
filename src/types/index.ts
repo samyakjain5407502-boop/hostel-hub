@@ -1,6 +1,14 @@
 /* Domain types for HostelHub */
 
-export type Role = 'student' | 'operator' | 'admin';
+/**
+ * Roles (4-tier portal architecture).
+ * ─────────────────────────────────────────────────────────────
+ *  student     → /dashboard/*   resident self-service
+ *  operator    → /mess/*        mess / kitchen counter staff
+ *  management  → /management/*  hostel desk: admissions, beds, fees
+ *  admin       → /admin/*       command centre: branches, BI, system
+ */
+export type Role = 'student' | 'operator' | 'management' | 'admin';
 
 export type Lang = 'en' | 'hi' | 'hinglish';
 

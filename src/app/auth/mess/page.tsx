@@ -30,7 +30,7 @@ export default function OperatorAuthPage() {
     try {
       if (demo) {
         await clientLogin(demoOperatorUser());
-        window.location.href = '/mess-operator';
+        window.location.href = '/mess';
         return;
       }
       const okId = operatorId.trim().toUpperCase() === DEMO_OPERATOR.id;
@@ -40,7 +40,7 @@ export default function OperatorAuthPage() {
         return;
       }
       await clientLogin(demoOperatorUser());
-      window.location.href = '/mess-operator';
+      window.location.href = '/mess';
     } catch {
       toast.push({ title: t('auth.error.invalid'), tone: 'warning' });
     } finally {

@@ -9,7 +9,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme/toggle';
 import { NotificationBell } from '@/components/notification-bell';
 import { Avatar } from '@/components/ui/avatar';
-import { useLang } from '@/i18n';
+import { useLang, type TKey } from '@/i18n';
 import { clientSignOut } from '@/lib/client-session';
 import { PORTAL_HOME, PORTAL_LABEL } from '@/lib/portals';
 import type { Role } from '@/types';
@@ -17,8 +17,9 @@ import type { Role } from '@/types';
 export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; onMenuClick: () => void }) {
   const { t } = useLang();
   const home = PORTAL_HOME[role];
-  const portalLabel = role === 'admin' ? t('nav.adminPortal') : role === 'operator' ? PORTAL_LABEL.operator : t('nav.studentPortal');
-  const homeLabel = role === 'admin' ? t('admin.title') : role === 'operator' ? 'Operator Console' : t('nav.dashboard');
+  const portalLabel = PORTAL_LABEL[role] === 'Student Portal' ? t('nav.studentPortal') : t(`portal.${role}` as TKey);
+  const homeLabel = PORTAL_HOME_LABEL[role];
+  const homeLabelText = homeLabel.key ? t(homeLabel.key) : homeLabel.label ?? '';
 
   return (
     <header className="glass-header sticky top-0 z-40 w-full max-w-full overflow-x-clip">
@@ -26,7 +27,7 @@ export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; 
         <button
           type="button"
           onClick={onMenuClick}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition active:scale-95 lg:hidden"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-brand-300 active:scale-95 lg:hidden"
           aria-label={t('a11y.openMenu')}
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
@@ -37,7 +38,7 @@ export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; 
           <span className="truncate font-display text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
             Hostel<span className="text-brand-600">Hub</span>
           </span>
-          <span className="ml-1 hidden rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500 md:inline-flex">
+          <span className="ml-1 hidden rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 md:inline-flex">
             {portalLabel}
           </span>
         </a>
@@ -46,12 +47,21 @@ export function Topbar({ role, name, onMenuClick }: { role: Role; name: string; 
           <ThemeToggle />
           <LanguageSwitcher />
           <NotificationBell />
-          <UserMenu role={role} name={name} portalLabel={portalLabel} home={home} homeLabel={homeLabel} />
+          <UserMenu role={role} name={name} portalLabel={portalLabel} home={home} homeLabel={homeLabelText} />
         </div>
       </div>
     </header>
   );
 }
+
+/** Where the account menu's first item points, per portal. */
+const PORTAL_HOME_LABEL: Record<Role, { key?: TKey; label?: string }> = {
+  student: { key: 'nav.dashboard' },
+  operator: { key: 'nav.messConsole' },
+  management: { key: 'nav.mgmtDashboard' },
+  admin: { key: 'admin.title' }
+};
+
 
 function UserMenu({ role, name, portalLabel, home, homeLabel }: {
   role: Role; name: string; portalLabel: string; home: string; homeLabel: string;
