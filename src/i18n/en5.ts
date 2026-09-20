@@ -7,6 +7,7 @@ export const en5 = {
   /* ---------- Nav ---------- */
   'nav.plate': 'My Plate',
   'nav.ledger': 'Fee Ledger',
+  'nav.booking': 'Booking Status',
   'nav.gatepass': 'Gate Pass',
   'nav.inventory': 'Room Inventory',
   'nav.admissions': 'Admissions',

@@ -205,6 +205,7 @@ export const hinglish5 = {
 
   /* ---------- Token booking confirmation ---------- */
   'book.title': 'Booking confirm karo',
+  'nav.booking': 'Booking status',
   'book.sub': 'Tumhare paas ₹2,000 token se book kiya hua ek bed hai. Grace window ke andar aa — warna holding rent bhare.',
   'book.bookingId': 'Booking ID',
   'book.branch': 'Branch',

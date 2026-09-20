@@ -52,7 +52,8 @@ const STUDENT_NAV: NavGroup[] = [
     items: [
       { href: '/dashboard/ledger', key: 'nav.ledger', icon: Receipt },
       { href: '/dashboard/gatepass', key: 'nav.gatepass', icon: QrCode },
-      { href: '/dashboard/complaints', key: 'nav.complaints', icon: LifeBuoy }
+      { href: '/dashboard/complaints', key: 'nav.complaints', icon: LifeBuoy },
+      { href: '/dashboard/book', key: 'nav.booking', icon: Building2 }
     ]
   }
 ];
