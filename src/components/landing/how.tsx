@@ -1,8 +1,10 @@
 'use client';
 
-import { ShieldCheck, UtensilsCrossed, Gift, TrendingUp } from 'lucide-react';
-import { LogoMark } from '@/components/brand';
+import { motion } from 'framer-motion';
+import { Gift, ShieldCheck, TrendingUp, UtensilsCrossed } from 'lucide-react';
 import { useLang, type TKey } from '@/i18n';
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const STEPS: { n: string; icon: typeof Gift; title: TKey; desc: TKey }[] = [
   { n: '01', icon: ShieldCheck, title: 'landing.how.s1t', desc: 'landing.how.s1d' },
@@ -11,72 +13,57 @@ const STEPS: { n: string; icon: typeof Gift; title: TKey; desc: TKey }[] = [
   { n: '04', icon: TrendingUp, title: 'landing.how.s4t', desc: 'landing.how.s4d' }
 ];
 
+/**
+ * The operating loop, told as a numbered rail.
+ * No bounding cards on purpose: four bare columns separated by white space read
+ * calmer than four more boxes, and the oversized ghost numeral gives the section
+ * its rhythm without adding another surface.
+ */
 export function HowItWorks() {
   const { t } = useLang();
+
   return (
-    <section id="how" className="mx-auto max-w-6xl px-5 py-16">
-      <div className="grid items-center gap-10 lg:grid-cols-2">
-        <div>
-          <h2 className="text-2xl font-extrabold text-slate-900">{t('landing.how.title')}</h2>
-          <p className="mt-2 text-slate-500">{t('landing.how.sub')}</p>
-          <ul className="mt-6 space-y-3">
-            {STEPS.map((s) => {
-              const Icon = s.icon;
-              return (
-                <li key={s.n} className="flex gap-4 rounded-xl border border-slate-200 bg-white/80 p-4">
-                  <span className="text-sm font-black text-brand-600">{s.n}</span>
-                  <div>
-                    <p className="flex items-center gap-2 font-semibold text-slate-800">
-                      <Icon className="h-4 w-4 text-slate-400" aria-hidden="true" /> {t(s.title)}
-                    </p>
-                    <p className="mt-0.5 text-sm text-slate-500">{t(s.desc)}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        <AppPreviewCard />
+    <section id="platform" className="scroll-mt-24 border-t border-slate-200 bg-white">
+      <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 sm:py-24">
+        <header className="grid gap-5 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-600">{t('landing.nav.how')}</p>
+            <h2 className="mt-3 text-balance font-display text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+              {t('landing.how.title')}
+            </h2>
+          </div>
+          <p className="text-sm leading-relaxed text-slate-600 sm:text-base lg:col-span-6 lg:pb-1">
+            {t('landing.how.sub')}
+          </p>
+        </header>
+
+        <ol className="mt-14 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map(({ n, icon: Icon, title, desc }, i) => (
+            <motion.li
+              key={n}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.45, delay: i * 0.07, ease: EASE }}
+              className="group relative"
+            >
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-3 right-0 font-display text-5xl font-black leading-none tracking-tighter text-slate-300 opacity-70 transition-opacity duration-300 group-hover:opacity-100"
+              >
+                {n}
+              </span>
+
+              <span className="grid h-12 w-12 place-items-center rounded-2xl border border-slate-200 bg-white text-brand-600 shadow-panel transition-colors duration-300 group-hover:border-brand-200 group-hover:text-brand-700">
+                <Icon className="h-5 w-5" aria-hidden="true" />
+              </span>
+
+              <h3 className="mt-6 font-display text-base font-extrabold tracking-tight text-slate-900">{t(title)}</h3>
+              <p className="mt-2 max-w-xs text-sm leading-relaxed text-slate-600">{t(desc)}</p>
+            </motion.li>
+          ))}
+        </ol>
       </div>
     </section>
-  );
-}
-
-/** Decorative product mock-up — aria-hidden, so it only needs translated copy. */
-function AppPreviewCard() {
-  const { t } = useLang();
-  return (
-    <div aria-hidden="true" className="relative overflow-hidden rounded-3xl border border-brand-200 bg-white p-6 shadow-soft">
-      <div className="mb-4 flex items-center gap-2">
-        <LogoMark />
-        <span className="font-display text-sm font-extrabold">HostelHub</span>
-        <span className="ml-auto rounded-full bg-success-100 px-2 py-0.5 text-[11px] font-semibold text-success-700">● Live</span>
-      </div>
-      <div className="space-y-3 rounded-2xl bg-slate-50 p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase text-slate-400">{t('landing.preview.slot')}</p>
-            <p className="text-lg font-bold text-slate-800">{t('landing.preview.dish')}</p>
-          </div>
-          <span className="rounded-lg bg-success-100 px-3 py-1.5 text-xs font-bold text-success-700">{t('landing.preview.optin')}</span>
-        </div>
-        <div className="h-2.5 rounded-full bg-slate-200">
-          <div className="h-2.5 w-[72%] rounded-full bg-gradient-to-r from-brand-500 to-violet-500" />
-        </div>
-        <p className="text-xs text-slate-500">{t('landing.preview.stats')}</p>
-      </div>
-      <div className="mt-3 space-y-3">
-        {([
-          ['🎁', t('landing.preview.gift')],
-          ['🛠️', t('landing.preview.fixed')],
-          ['🏆', t('landing.preview.rank')]
-        ] as const).map(([emoji, label]) => (
-          <div key={label} className="grid grid-cols-3 items-center gap-1 rounded-xl border border-slate-200 p-3">
-            <span className="text-2xl">{emoji}</span>
-            <span className="col-span-2 text-xs text-slate-500">{label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }

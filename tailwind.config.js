@@ -117,7 +117,18 @@ module.exports = {
       boxShadow: {
         soft: '0 10px 30px -12px rgba(79,70,229,0.18)',
         lift: '0 1px 2px rgba(15,23,42,0.06), 0 4px 14px -6px rgba(15,23,42,0.12)',
-        ring: '0 0 0 4px rgba(99,102,241,0.14)'
+        ring: '0 0 0 4px rgba(99,102,241,0.14)',
+        /* ---------- Landing surfaces (hand-calibrated, never a harsh black blur)
+           Each one is a near-invisible 1px contact shadow + one wide, very soft
+           throw tinted with the indigo brand, which is what reads as "crafted"
+           rather than "CSS default". ------------------------------------- */
+        panel: '0 1px 1px rgba(15,23,42,0.04), 0 2px 4px -1px rgba(15,23,42,0.05), 0 14px 28px -20px rgba(15,23,42,0.16)',
+        'panel-hover':
+          '0 1px 1px rgba(15,23,42,0.04), 0 6px 12px -4px rgba(15,23,42,0.06), 0 24px 48px -22px rgba(15,23,42,0.18), 0 44px 84px -52px rgba(79,70,229,0.32)',
+        btn: '0 1px 1px rgba(15,23,42,0.05), 0 6px 14px -8px rgba(79,70,229,0.42)',
+        'btn-hover': '0 1px 1px rgba(15,23,42,0.06), 0 12px 24px -10px rgba(79,70,229,0.5)',
+        'btn-strong':
+          '0 1px 0 rgba(255,255,255,0.16) inset, 0 2px 4px rgba(49,46,129,0.22), 0 14px 30px -14px rgba(79,70,229,0.55)'
       },
       backgroundImage: {
         'brand-gradient': 'linear-gradient(100deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%)'
