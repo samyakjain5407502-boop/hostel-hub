@@ -1,3 +1,4 @@
+import { isMockMode } from '@/lib/data-mode';
 import type { College, Role, Session, User } from '@/types';
 
 /**
@@ -7,7 +8,33 @@ import type { College, Role, Session, User } from '@/types';
  * Server Action + Supabase Auth / Prisma session in production.
  */
 
-const SECRET = process.env.AUTH_SECRET || 'hostelhub_demo_signing_secret_change_me';
+/**
+ * Signing secret.
+ *
+ * Mock/dev runs must work with zero configuration, so they fall back to a
+ * well-known demo secret. A live deployment (`NEXT_PUBLIC_DATA_MODE=supabase`)
+ * must bring its own `AUTH_SECRET`: signing sessions with the public demo
+ * string would let anybody forge a token, so we fail loudly instead of
+ * silently shipping forgeable sessions.
+ *
+ * `AUTH_SECRET` is deliberately not a `NEXT_PUBLIC_*` variable, so it is only
+ * readable on the server. In live mode the browser bundle cannot read it —
+ * session issuing/verifying belongs in a route handler / Server Action there.
+ */
+const DEMO_SECRET = 'hostelhub_demo_signing_secret_change_me';
+
+function resolveSecret(): string {
+  const configured = process.env.AUTH_SECRET?.trim();
+  if (configured) return configured;
+  if (isMockMode() || process.env.NODE_ENV === 'development') return DEMO_SECRET;
+  throw new Error(
+    'AUTH_SECRET is not set. Refusing to sign HostelHub sessions with the public demo ' +
+      'secret while NEXT_PUBLIC_DATA_MODE=supabase. Set AUTH_SECRET to a long random ' +
+      'string in your environment (see .env.example) and restart the server.'
+  );
+}
+
+const SECRET = resolveSecret();
 const COOKIE = 'hostelhub_session';
 const LIFETIME = 60 * 60 * 12; // 12h
 

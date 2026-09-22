@@ -1,3 +1,8 @@
+/**
+ * Operational demo records for the multi-hostel modules: the bed map,
+ * admission applications, token bookings, fee invoices and smart gate passes
+ * (plus their supporting types). Branches/owners live in `seed-hostels.ts`.
+ */
 import type {
   BedConfig, Branch, FeeInvoice, FoodTag, GenderTag, GatePass, OwnerProfile,
   RoomBed, StudentApplication, TokenBooking

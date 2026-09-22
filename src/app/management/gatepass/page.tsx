@@ -12,14 +12,15 @@ import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useDb } from '@/lib/store';
-import { useLang } from '@/i18n';
+import { useLang, type LangCtx } from '@/i18n';
 import { useToast } from '@/components/ui/toast';
 import { PassCode } from '@/components/gatepass/pass-code';
 import { cn, timeAgo } from '@/lib/utils';
+import type { GatePass } from '@/types';
 
 export default function ManagementGatePassPage() {
   const db = useDb();
-  const { t, n } = useLang();
+  const { t, tr, n } = useLang();
   const toast = useToast();
   const [filter, setFilter] = React.useState<'all' | 'active'>('active');
 
@@ -67,7 +68,7 @@ export default function ManagementGatePassPage() {
           <p className="mt-2 text-sm text-slate-400">No passes to show.</p>
         ) : (
           <ul className="mt-2 divide-y">
-            {passes.map((g) => <AdminPassRow key={g.id} pass={g} t={t} n={n} />)}
+            {passes.map((g) => <AdminPassRow key={g.id} pass={g} t={t} tr={tr} n={n} />)}
           </ul>
         )}
       </Card>
@@ -75,10 +76,21 @@ export default function ManagementGatePassPage() {
   );
 }
 
-function AdminPassRow({ pass, t, n }: { pass: any; t: (k: any) => string; n: (v: number) => string }) {
+function AdminPassRow({
+  pass, t, tr, n
+}: {
+  pass: GatePass;
+  t: LangCtx['t'];
+  /** Resolves the i18n keys stored on the pass (status + reason) to labels. */
+  tr: LangCtx['tr'];
+  n: (v: number) => string;
+}) {
   const db = useDb();
   const toast = useToast();
   const statusKey = `gate.status.${pass.status}`;
+  /* The pass stores an expected-return timestamp rather than an hour count, so
+     the return window is derived from the two stamps that are on the record. */
+  const hours = Math.round((pass.expectedReturn - pass.outAt) / 3_600_000);
   const Tone = (() => {
     switch (pass.status) {
       case 'Approved': case 'Out': return 'rose';
@@ -94,10 +106,10 @@ function AdminPassRow({ pass, t, n }: { pass: any; t: (k: any) => string; n: (v:
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-semibold text-slate-800">{pass.studentName}</span>
-          <Badge tone={Tone}>{t(statusKey)}</Badge>
+          <Badge tone={Tone}>{tr(statusKey)}</Badge>
         </div>
         <p className="mt-0.5 text-xs text-slate-500">
-          {pass.destination} · {t(`gate.reason.${pass.reason}`)} · {pass.hours}hr return window · requested {timeAgo(pass.createdAt)}
+          {pass.destination} · {tr(pass.reason)} · {hours}hr return window · requested {timeAgo(pass.outAt)}
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">

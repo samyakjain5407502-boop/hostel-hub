@@ -1,8 +1,12 @@
-// part 2 — remaining complaints
+/**
+ * Second batch of complaint records - the older resolved/closed tickets plus
+ * one fresh urgent one - layered on top of `seed-complaints.ts` so the triage
+ * screen has history to show alongside the live queue.
+ */
 import type { Complaint } from '@/types';
 
 const t = Date.now();
-export const seedComplaints2: Complaint[] = [
+export const seedComplaintsExtra: Complaint[] = [
   {
     id: 'CM-1028',
     category: 'Mess/Food Quality',

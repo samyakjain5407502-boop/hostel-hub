@@ -7,10 +7,10 @@ import type {
 } from '@/types';
 import { buildWeek, TODAY_KEY } from '@/lib/data/seed-meals';
 import { seedComplaints } from '@/lib/data/seed-complaints';
-import { seedComplaints2 } from '@/lib/data/seed-complaints2';
+import { seedComplaintsExtra } from '@/lib/data/seed-complaints-extra';
 import { seedLeaderboard, seedNotifications, seedPoll, seedRewardHistory } from '@/lib/data/seed-rewards';
 import { seedBranches, seedOwners } from '@/lib/data/seed-hostels';
-import { seedBeds, seedApplications, seedBookings, seedInvoices, seedGatePasses } from '@/lib/data/seed-hostels2';
+import { seedBeds, seedApplications, seedBookings, seedInvoices, seedGatePasses } from '@/lib/data/seed-operations';
 
 export const LS = 'hostelhub.db.v1';
 
@@ -91,7 +91,7 @@ export function defaultSnapshot(_old?: DbSnapshot | null): DbSnapshot {
     rewards: seedRewardHistory.map((r) => ({ ...r })),
     gifts: { lastScratchAt: null, scratchLeft: 3 },
     notifications: seedNotifications.map((n) => ({ ...n })),
-    complaints: [...seedComplaints, ...seedComplaints2],
+    complaints: [...seedComplaints, ...seedComplaintsExtra],
     poll: JSON.parse(JSON.stringify(seedPoll)),
     week: weekSeed(),
     leaderboard: seedLeaderboard.map((l) => ({ ...l })),
