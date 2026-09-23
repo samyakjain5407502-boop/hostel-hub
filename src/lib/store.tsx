@@ -3,7 +3,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { RewardTxn } from '@/types';
 import { load, persist, defaultSnapshot, type DbSnapshot } from './store-core';
-import { buildApi } from './store-api';
+import { buildApi, hydrateFromLive } from './store-api';
+import { isLiveMode } from './data-mode';
 
 export type DbApi = ReturnType<typeof buildApi>;
 export type { PerkInline } from './store-api';
@@ -18,6 +19,26 @@ export function DbProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = load();
     setDb((current) => (sameSnapshot(current, stored) ? current : stored));
+
+    // LIVE (Phase 4): overlay the Supabase-backed slices (week / wallet /
+    // rewards / complaints) onto the local snapshot. Guarded on isLiveMode()
+    // so mock mode keeps byte-for-byte the behavior it has today (and the
+    // overlay only applies if the user hasn't acted since `load()`).
+    if (!isLiveMode()) return;
+    let cancelled = false;
+    hydrateFromLive(stored)
+      .then((fresh) => {
+        if (cancelled) return;
+        setDb((current) =>
+          !sameSnapshot(current, stored) ? current
+            : sameSnapshot(current, fresh) ? current
+              : fresh
+        );
+      })
+      .catch((error) => {
+        console.error('[live] hydration failed — keeping localStorage snapshot', error);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   function commit(next: DbSnapshot) {

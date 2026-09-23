@@ -211,7 +211,17 @@ export async function deliverOtp(challenge: OtpChallenge): Promise<OtpDelivery> 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ challengeId: challenge.id, mobile: challenge.mobile }),
   });
-  if (!res.ok) throw new Error('otp_gateway_unavailable');
+  if (!res.ok) {
+    // Surface the server's reason (e.g. `sms_not_configured`, naming the
+    // missing env vars) so a misconfigured live deployment is debuggable
+    // instead of a silent "gateway unavailable".
+    const detail = (await res.json().catch(() => null)) as
+      | { error?: string; message?: string; missing?: string[] }
+      | null;
+    const reason = detail?.error ?? `http_${res.status}`;
+    const hint = detail?.missing?.length ? ` (set ${detail.missing.join(', ')})` : '';
+    throw new Error(`otp_send_failed:${reason}${hint}`);
+  }
   return { via: 'sms' };
 }
 

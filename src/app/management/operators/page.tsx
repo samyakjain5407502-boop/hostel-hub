@@ -12,6 +12,9 @@ import * as React from 'react';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
+import { isLiveMode } from '@/lib/data-mode';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { ensureProfileSynced } from '@/lib/supabase/profile-sync';
 
 interface OperatorRequest {
   id: string;
@@ -26,19 +29,89 @@ const SEED_REQUESTS: OperatorRequest[] = [
   { id: 'REQ-102', name: 'Priya Kulkarni', college: 'Arts & Science College', requestedAt: Date.now() - 5 * 3600_000 }
 ];
 
+/** LIVE row shape from the `operators` table. */
+interface OperatorRowDb {
+  id: string; name: string; college: string | null; status: string;
+  requested_at: string;
+}
+
+/** LIVE: pending queue from the DB (staff RLS). null → keep local cache. */
+async function loadLiveRequests(): Promise<OperatorRowDb[] | null> {
+  if (!isLiveMode()) return null;
+  const sb = getSupabaseBrowserClient();
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb.from('operators').select('*')
+      .eq('status', 'pending').order('requested_at', { ascending: true });
+    if (error) throw error;
+    return (data ?? []) as unknown as OperatorRowDb[];
+  } catch (err) {
+    console.error('[live] operator queue fetch failed', err);
+    return null;
+  }
+}
+
+/** LIVE: record the desk's decision (RLS: admin/management after role sync). */
+function persistLiveDecision(id: string, status: 'approved' | 'rejected'): void {
+  if (!isLiveMode()) return;
+  void (async () => {
+    try {
+      await ensureProfileSynced();
+      const sb = getSupabaseBrowserClient();
+      if (!sb) return;
+      const { data, error } = await sb.from('operators')
+        .update({ status, decided_at: new Date().toISOString() })
+        .eq('id', id).select('id');
+      if (error) throw error;
+      if (!data?.length) {
+        console.warn('[live] operator decision matched no row (RLS denied)');
+      }
+    } catch (err) {
+      console.error('[live] operator decision failed', err);
+    }
+  })();
+}
+
 export default function ManagementOperatorsPage() {
   const toast = useToast();
   const [requests, setRequests] = React.useState<OperatorRequest[]>([]);
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem('hostelhub.operator-requests.v1');
-      setRequests(raw ? (JSON.parse(raw) as OperatorRequest[]) : SEED_REQUESTS);
-    } catch {
-      setRequests(SEED_REQUESTS);
+    const loadCache = () => {
+      try {
+        const raw = window.localStorage.getItem('hostelhub.operator-requests.v1');
+        setRequests(raw ? (JSON.parse(raw) as OperatorRequest[]) : SEED_REQUESTS);
+      } catch {
+        setRequests(SEED_REQUESTS);
+      }
+      setReady(true);
+    };
+
+    // Mock mode: exactly today's synchronous localStorage path.
+    if (!isLiveMode()) {
+      loadCache();
+      return;
     }
-    setReady(true);
+
+    // LIVE: the `operators` table is the source of truth for the queue;
+    // fall back to the local cache if the fetch fails.
+    let cancelled = false;
+    void loadLiveRequests().then((rows) => {
+      if (cancelled) return;
+      if (rows) {
+        setRequests(rows.map((r) => ({
+          id: r.id,
+          name: r.name,
+          college: r.college ?? '',
+          requestedAt: Date.parse(r.requested_at)
+        })));
+        setReady(true);
+      } else {
+        loadCache();
+      }
+    });
+    return () => { cancelled = true; };
   }, []);
 
   function persist(next: OperatorRequest[]) {
@@ -53,6 +126,7 @@ export default function ManagementOperatorsPage() {
   function approve(id: string) {
     const found = requests.find((r) => r.id === id);
     persist(requests.filter((r) => r.id !== id));
+    if (isLiveMode()) persistLiveDecision(id, 'approved');
     toast.push({
       title: `${found?.name ?? id} approved`,
       body: `Operator credentials issued for ${found?.college ?? 'the hostel'}.`,
@@ -63,6 +137,7 @@ export default function ManagementOperatorsPage() {
   function reject(id: string) {
     const found = requests.find((r) => r.id === id);
     persist(requests.filter((r) => r.id !== id));
+    if (isLiveMode()) persistLiveDecision(id, 'rejected');
     toast.push({ title: `${found?.name ?? id}'s request rejected`, tone: 'warning' });
   }
 

@@ -1,5 +1,20 @@
 // HostelHub · Prisma schema (alternative to Supabase).
+// ==================================================================
+// This file is a 1:1 mirror of `supabase/schema.sql`: same tables, same
+// column names (snake_case, via `@map`), so the app can run against either
+// backend without changing a single entity shape.
+//
+// Conventions
+//   • App-visible ids are plain `String` primary keys that carry the *exact*
+//     id the mock layer uses ('BR-SUN-BOYS', 'BED-…', 'APP-9001', 'CM-1042',
+//     'rx-1', 'CLG-ENG-01', …) so rows round-trip mock ↔ SQL untouched.
+//   • Epoch-millisecond fields in `src/types` are stored as `DateTime`
+//     (timestamptz) — `src/lib/supabase/mapping.ts` converts both ways.
+//   • Array / record fields (amenities, roomFees, photos, items, menuMeta,
+//     ratings, lines, options, badges, meta) are stored as `Json`.
+//
 // Wire your DATABASE_URL in .env.local to migrate: `npx prisma migrate dev`
+// (or apply `supabase/schema.sql` in the Supabase SQL editor instead).
 
 generator client {
   provider = "prisma-client-js"
@@ -10,82 +25,575 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role { student admin }
-enum Slot { breakfast lunch snacks dinner }
-enum Priority { Urgent Normal }
-enum ComplaintStatus { Submitted In_Review Technician_Assigned Resolved Closed }
+// ==================================================================
+// Enums — mirror the CHECK constraints in supabase/schema.sql
+// ==================================================================
 
-model Profile {
-  id        String   @id @default(cuid())
-  role      Role
-  name      String
-  studentId String?  @unique
-  email     String?  @unique
-  complaints Complaint[]
-  rewards   Reward[]
-  optedMeals MealOptIn[]
-  wallet    Wallet?
+enum Role {
+  student
+  operator
+  management
+  admin
 }
 
+enum MessSlot {
+  breakfast
+  lunch
+  snacks
+  dinner
+}
+
+enum MealStatus {
+  active
+  closed
+  upcoming
+  done
+}
+
+enum OptChoice {
+  optin
+  optout
+}
+
+enum Priority {
+  Urgent
+  Normal
+}
+
+enum ComplaintStatus {
+  Submitted
+  In_Review           @map("In Review")
+  Technician_Assigned @map("Technician Assigned")
+  Resolved
+  Closed
+}
+
+enum RewardKind {
+  eco
+  discipline
+}
+
+enum NotificationTone {
+  info
+  success
+  warning
+  reward
+}
+
+enum GenderTag {
+  Girls
+  Boys
+  Open_to_All @map("Open to All")
+}
+
+enum FoodTag {
+  Jain
+  Pure_Veg @map("Pure Veg")
+  Non_Veg  @map("Non-Veg")
+}
+
+enum BedConfig {
+  One_Bed   @map("1-Bed")
+  Two_Bed   @map("2-Bed")
+  Three_Bed @map("3-Bed")
+  Four_Bed  @map("4-Bed")
+}
+
+enum BedStatus {
+  Vacant
+  Locked
+  Booked
+}
+
+enum ApplicationStatus {
+  Waiting_for_Admin_Approval @map("Waiting for Admin Approval")
+  Approved
+  Rejected
+}
+
+enum BookingStatus {
+  Held
+  Confirmed
+  Expired
+}
+
+enum GatePassStatus {
+  Requested
+  Approved
+  Out
+  Returned
+  Rejected
+}
+
+enum InventoryStatus {
+  In_Stock     @map("In Stock")
+  Low
+  Out_of_Stock @map("Out of Stock")
+}
+
+enum OperatorStatus {
+  pending
+  approved
+  rejected
+}
+
+enum CollegeStatus {
+  approved
+  pending
+}
+
+enum CollegeSource {
+  directory
+  manual
+}
+
+// ==================================================================
+// Identity — profiles (extends auth.users) + hostel owners
+// ==================================================================
+
+model Profile {
+  id          String   @id @default(uuid()) @db.Uuid
+  /// Supabase auth user owning this profile (null for mock-seeded rows).
+  authId      String?  @unique @map("auth_id") @db.Uuid
+  role        Role
+  name        String
+  studentId   String?  @unique @map("student_id")
+  email       String?  @unique
+  mobile      String?
+  collegeId   String?  @map("college_id")
+  collegeName String?  @map("college_name")
+  avatarHue   Int      @default(248) @map("avatar_hue")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  wallet        Wallet?
+  gifts         GiftState?
+  rewards       Reward[]
+  notifications Notification[]
+  complaints    Complaint[]
+  optedMeals    MealOptIn[]
+  plates        PlateSelection[]
+  pollVotes     PollVote[]
+  operator      Operator?
+
+  @@index([role])
+  @@index([collegeId])
+  @@map("profiles")
+}
+
+/// OwnerProfile — the person who owns one or more hostel branches.
+model Owner {
+  id           String   @id
+  fullName     String   @map("full_name")
+  email        String   @unique
+  phone        String
+  age          Int
+  aadhaarLast4 String   @map("aadhaar_last4")
+  verified     Boolean  @default(false)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  branches Branch[]
+
+  @@map("owners")
+}
+
+// ==================================================================
+// Mess — weekly plan, per-student opt-ins, plate selections
+// ==================================================================
+
 model MealPlan {
-  id     String @id @default(cuid())
-  date   DateTime
-  slot   Slot
-  label  String
-  time   String?
-  credits Int   @default(10)
-  status String @default("upcoming")
-  items  Json
+  id            String     @id
+  date          DateTime   @map("date") @db.Date
+  slot          MessSlot
+  label         String
+  time          String?
+  credits       Int        @default(10)
+  status        MealStatus @default(upcoming)
+  items         Json       @default("[]")
+  /// Per-item service metadata: { [itemName]: { available, price } }
+  menuMeta      Json       @default("{}") @map("menu_meta")
+  veg           Boolean    @default(true)
+  participating Int        @default(0)
+  optedOut      Int        @default(0) @map("opted_out")
+  /// RateStats | null
+  ratings       Json?
+  special       Boolean    @default(false)
+
   optIns MealOptIn[]
+  plates PlateSelection[]
+
   @@unique([date, slot])
+  @@index([date])
+  @@map("meal_plans")
 }
 
 model MealOptIn {
-  id        String @id @default(cuid())
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId String
-  mealPlan  MealPlan @relation(fields: [mealPlanId], references: [id])
-  mealPlanId String
-  choice    String
-  @@unique([profileId, mealPlanId])
+  id         String   @id @default(uuid()) @db.Uuid
+  studentId  String   @map("student") @db.Uuid
+  student    Profile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mealPlanId String   @map("meal_plan")
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  choice     OptChoice
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([studentId, mealPlanId])
+  @@index([mealPlanId])
+  @@map("meal_opt_ins")
 }
 
+/// PlateSelection — which components a student ticked off for a meal slot.
+model PlateSelection {
+  studentId   String   @map("student") @db.Uuid
+  student     Profile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mealPlanId  String   @map("meal_plan")
+  mealPlan    MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  items       Json     @default("[]")
+  sweetOptIn  Boolean  @default(false) @map("sweet_opt_in")
+  skipped     Boolean  @default(false)
+  absenceDays Json     @default("[]") @map("absence_days")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@id([studentId, mealPlanId])
+  @@map("plate_selections")
+}
+
+// ==================================================================
+// Dining-credit wallet, gamification, notifications
+// ==================================================================
+
 model Wallet {
-  id         String @id @default(cuid())
-  profile    Profile @relation(fields: [profileId], references: [id])
-  profileId  String @unique
-  allocation Int    @default(120)
-  used       Int    @default(0)
-  onMeal     Int    @default(0)
-  redeemed   Int    @default(0)
+  studentId  String   @id @map("student") @db.Uuid
+  student    Profile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  allocation Int      @default(120)
+  used       Int      @default(0)
+  onMeal     Int      @default(0) @map("on_meal")
+  redeemed   Int      @default(0)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("wallets")
 }
 
 model Reward {
-  id        String @id @default(cuid())
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId String
-  kind      String
+  id        String     @id
+  studentId String?    @map("student") @db.Uuid
+  student   Profile?   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  kind      RewardKind
   points    Int
   label     String
   meta      String?
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  @@index([studentId, createdAt])
+  @@map("rewards")
+}
+
+model GiftState {
+  studentId     String    @id @map("student") @db.Uuid
+  student       Profile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  scratchLeft   Int       @default(3) @map("scratch_left")
+  lastScratchAt DateTime? @map("last_scratch")
+
+  @@map("gift_state")
+}
+
+model Notification {
+  id        String           @id
+  studentId String?          @map("student") @db.Uuid
+  student   Profile?         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  at        DateTime         @default(now())
+  isRead    Boolean          @default(false) @map("is_read")
+  tone      NotificationTone @default(info)
+  meta      Json?
+
+  @@index([studentId, isRead])
+  @@map("notifications")
+}
+
+model LeaderboardEntry {
+  studentId String @id @map("student_id")
+  rank      Int
+  name      String
+  points    Int
+  streak    Int    @default(0)
+  badges    Json   @default("[]")
+
+  @@index([rank])
+  @@map("leaderboard_entries")
+}
+
+// ==================================================================
+// Polls (weekend menu voting)
+// ==================================================================
+
+model Poll {
+  id       String   @id
+  titleKey String   @map("title_key")
+  closesAt DateTime @map("closes_at")
+  /// PollOption[]: { id, dish, emoji, votes }
+  options  Json     @default("[]")
+
+  votes PollVote[]
+
+  @@map("polls")
+}
+
+model PollVote {
+  pollId    String  @map("poll")
+  poll      Poll    @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  studentId String  @map("student") @db.Uuid
+  student   Profile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  optionId  String  @map("option_id")
+
+  @@id([pollId, studentId])
+  @@map("poll_votes")
+}
+
+// ==================================================================
+// Complaints — fast-track ticket pipeline + reward perk catalogue
+// ==================================================================
+
+enum PerkRarity {
+  common
+  rare
+  epic
+}
+
+/// Perk catalogue — mirrors PERK_LIST in `src/lib/store-core.tsx`.
+model Perk {
+  id          String     @id
+  emoji       String
+  titleKey    String     @map("title_key")
+  descKey     String     @map("desc_key")
+  rarity      PerkRarity
+  costCredits Int        @default(0) @map("cost_credits")
+
+  @@map("perks")
 }
 
 model Complaint {
-  id          String @id @default(cuid())
-  ticketNo    String @unique
-  author      Profile? @relation(fields: [authorId], references: [id])
-  authorId    String?
+  id          String          @id
+  authorId    String?         @map("author") @db.Uuid
+  author      Profile?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  /// Display name captured with the ticket (the mock `author` field).
+  authorName  String          @map("author_name")
   category    String
   title       String
   description String?
-  priority    Priority
+  priority    Priority        @default(Normal)
   status      ComplaintStatus @default(Submitted)
-  photoUrl    String?
+  photoUrl    String?         @map("photo_url")
   assignee    String?
   feedback    String?
-  slaSeconds  Int?
-  votes       Int    @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  slaSeconds  Int?            @map("sla_seconds")
+  votes       Int             @default(0)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("complaints")
+}
+
+// ==================================================================
+// Multi-hostel marketplace — owners → branches (hostels) → beds
+// ==================================================================
+
+/// Branch / Hostel — one hostel building run by an owner.
+/// The app calls these "hostels" in the marketplace UI and `Branch` in code
+/// (`Branch`, `branchId`), so `public.hostels` in schema.sql is a read-only
+/// view over this table and both names resolve to the same rows.
+model Branch {
+  id          String    @id
+  ownerId     String    @map("owner_id")
+  owner       Owner     @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  name        String
+  gender      GenderTag
+  food        FoodTag
+  address     String
+  /// string[] of amenity i18n keys
+  amenities   Json      @default("[]")
+  mealsPerDay Int       @default(3) @map("meals_per_day")
+  /// RoomFee[]: { config, monthlyFee }
+  roomFees    Json      @default("[]") @map("room_fees")
+  sponsored   Boolean   @default(false)
+  rating      Float     @default(4.0)
+  reviews     Int       @default(0)
+  photos      Json      @default("[]")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  beds         Bed[]
+  applications StudentApplication[]
+  bookings     TokenBooking[]
+  invoices     FeeInvoice[]
+  gatePasses   GatePass[]
+  inventory    InventoryItem[]
+
+  @@index([ownerId])
+  @@index([gender])
+  @@index([sponsored])
+  @@map("branches")
+}
+
+model Bed {
+  id         String    @id
+  branchId   String    @map("branch_id")
+  branch     Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  roomNo     String    @map("room_no")
+  config     BedConfig
+  bedNo      Int       @map("bed_no")
+  status     BedStatus @default(Vacant)
+  /// Student id of the occupant (mock uses `STU-23045` style ids).
+  occupantId String?   @map("occupant_id")
+  monthlyFee Int       @map("monthly_fee")
+
+  applications StudentApplication[]
+  bookings     TokenBooking[]
+
+  @@unique([branchId, roomNo, bedNo])
+  @@index([branchId, status])
+  @@index([occupantId])
+  @@map("beds")
+}
+
+/// Admission application — the management desk's verification queue.
+model StudentApplication {
+  id           String            @id
+  studentName  String            @map("student_name")
+  studentId    String            @map("student_id")
+  aadhaarLast4 String            @map("aadhaar_last4")
+  verified     Boolean           @default(false)
+  branchId     String            @map("branch_id")
+  branch       Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  bedId        String?           @map("bed_id")
+  bed          Bed?              @relation(fields: [bedId], references: [id], onDelete: SetNull)
+  status       ApplicationStatus @default(Waiting_for_Admin_Approval)
+  createdAt    DateTime          @default(now()) @map("created_at")
+  decidedAt    DateTime?         @map("decided_at")
+
+  bookings TokenBooking[]
+
+  @@index([branchId, status])
+  @@index([studentId])
+  @@index([createdAt])
+  @@map("applications")
+}
+
+/// Token booking — money held against a bed until the student arrives.
+model TokenBooking {
+  id              String             @id
+  applicationId   String             @map("application_id")
+  application     StudentApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  branchId        String             @map("branch_id")
+  branch          Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  bedId           String             @map("bed_id")
+  bed             Bed                @relation(fields: [bedId], references: [id], onDelete: Cascade)
+  tokenAmount     Int                @map("token_amount")
+  graceDays       Int                @default(7) @map("grace_days")
+  bookedAt        DateTime           @default(now()) @map("booked_at")
+  expectedArrival DateTime           @map("expected_arrival")
+  actualArrival   DateTime?          @map("actual_arrival")
+  addonRent       Int                @default(0) @map("addon_rent")
+  status          BookingStatus      @default(Held)
+
+  @@index([status])
+  @@index([branchId])
+  @@index([bedId])
+  @@map("bookings")
+}
+
+/// Fee invoice — monthly rent + food charge with absence deductions.
+model FeeInvoice {
+  id               String   @id
+  studentName      String   @map("student_name")
+  branchId         String   @map("branch_id")
+  branch           Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  month            String
+  roomRent         Int      @map("room_rent")
+  foodCharge       Int      @map("food_charge")
+  absenceDeduction Int      @default(0) @map("absence_deduction")
+  addonRent        Int      @default(0) @map("addon_rent")
+  total            Int
+  paid             Boolean  @default(false)
+  /// FeeLine[]: { label, amount }
+  lines            Json     @default("[]")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([branchId, month])
+  @@index([paid])
+  @@map("invoices")
+}
+
+/// Smart gate pass — request → approval → out → returned, with a QR code.
+model GatePass {
+  id             String         @id
+  studentName    String         @map("student_name")
+  studentId      String         @map("student_id")
+  branchId       String         @map("branch_id")
+  branch         Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  reason         String
+  destination    String
+  outAt          DateTime       @map("out_at")
+  expectedReturn DateTime       @map("expected_return")
+  actualReturn   DateTime?      @map("actual_return")
+  status         GatePassStatus @default(Requested)
+  /// 6-character code rendered into the QR-style visual.
+  code           String         @unique @db.Char(6)
+
+  @@index([studentId])
+  @@index([branchId, status])
+  @@map("gate_passes")
+}
+
+/// Stock / asset register for a branch. (`/management/inventory` renders the
+/// bed matrix — this table is the article-level stock record beside it.)
+model InventoryItem {
+  id           String          @id
+  branchId     String          @map("branch_id")
+  branch       Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  name         String
+  category     String
+  unit         String          @default("pcs")
+  quantity     Int             @default(0)
+  reorderLevel Int             @default(0) @map("reorder_level")
+  unitCost     Int             @default(0) @map("unit_cost")
+  status       InventoryStatus @default(In_Stock)
+  updatedAt    DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  @@index([branchId, category])
+  @@index([status])
+  @@map("inventory_items")
+}
+
+/// Mess / desk staff onboarding requests.
+model Operator {
+  id          String         @id
+  profileId   String?        @unique @map("profile") @db.Uuid
+  profile     Profile?       @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  name        String
+  college     String
+  role        Role           @default(operator)
+  status      OperatorStatus @default(pending)
+  requestedAt DateTime       @default(now()) @map("requested_at")
+  decidedAt   DateTime?      @map("decided_at")
+
+  @@index([status])
+  @@map("operators")
+}
+
+/// College directory entry — drives the student sign-in combobox.
+model College {
+  id           String        @id
+  name         String        @unique
+  city         String?
+  address      String?
+  contactEmail String?       @map("contact_email")
+  status       CollegeStatus @default(approved)
+  source       CollegeSource @default(directory)
+  addedAt      DateTime      @default(now()) @map("added_at")
+  addedBy      String?       @map("added_by")
+
+  @@index([status])
+  @@map("colleges")
 }

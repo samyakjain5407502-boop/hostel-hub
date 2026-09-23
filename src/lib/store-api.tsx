@@ -5,6 +5,52 @@ import type {
   RateStats, RewardTxn, RoomBed, StudentApplication, TokenBooking, PlateSelection, FeeInvoice
 } from '@/types';
 import { hashId } from '@/lib/utils';
+import { isLiveMode } from './data-mode';
+import {
+  hydrateFromLive as hydratePhase4,
+  liveAddComplaint,
+  liveBroadcast,
+  liveClaimPerk,
+  liveOptMeal,
+  liveRateMeal,
+  liveSetComplaintStatus,
+  liveSetMealStatus,
+  liveUpvoteComplaint,
+  liveUpdateMenuItem
+} from './supabase/live-data';
+import {
+  hydrateOperations,
+  liveApplyForHostel,
+  liveBookToken,
+  liveBuildInvoice,
+  liveConfirmArrival,
+  liveDecideApplication,
+  liveMarkInvoicePaid,
+  liveOnboardWalkIn,
+  liveRegisterBranch,
+  liveRegisterOwner,
+  liveRequestGatePass,
+  liveSetBedStatus,
+  liveSetGatePassStatus,
+  liveToggleSponsor
+} from './supabase/live-ops';
+import { ensureProfileSynced } from './supabase/profile-sync';
+
+/**
+ * Combined live hydration (Phase 4 + Phase 5). Order matters:
+ *   1. ensureProfileSynced() — bridge the app session's role/name/roll
+ *      number into `profiles` so the RLS-scoped reads below see staff/own
+ *      rows (no-op in mock mode; memoized in live mode);
+ *   2. Phase-4 slices (week / wallet / rewards / complaints);
+ *   3. Phase-5 slices (owners / branches / beds / applications / bookings /
+ *      invoices / gate passes).
+ * store.tsx guards the call with isLiveMode() — in mock mode none of this
+ * runs and behavior stays byte-for-byte identical.
+ */
+export async function hydrateFromLive(base: DbSnapshot): Promise<DbSnapshot> {
+  await ensureProfileSynced();
+  return hydrateOperations(await hydratePhase4(base));
+}
 import { defaultSnapshot, PERK_LIST, TAIL, type DbSnapshot } from './store-core';
 
 export interface PerkInline {
@@ -37,6 +83,17 @@ export function buildApi(
     } else {
       commit({ ...db, week, wallet: { ...db.wallet, onMeal: db.wallet.onMeal + 5 } });
     }
+
+    // LIVE: mirror this choice to Supabase — meal_plans head-counts, this
+    // student's meal_opt_ins rows, wallet.on_meal and the reward txn.
+    // (Mock path above is untouched; this block never runs in mock mode.)
+    if (isLiveMode()) {
+      const finalWallet =
+        choice === 'optout'
+          ? { ...db.wallet, onMeal: Math.max(0, db.wallet.onMeal - 5) }
+          : { ...db.wallet, onMeal: db.wallet.onMeal + 5 };
+      void liveOptMeal(week, mealId, choice, finalWallet, txn);
+    }
     return txn;
   }
 
@@ -47,6 +104,9 @@ export function buildApi(
     }));
     const txn: RewardTxn = { id: 'rx-' + hashId('rate' + Date.now()), kind: 'eco', points: 10, label: 'reward.rating', at: Date.now(), meta: 'reward.meta.verified' };
     commit({ ...db, week, rewards: award(db.rewards, txn) });
+
+    // LIVE: persist the rating (meal_plans.ratings) + the +10 eco reward.
+    if (isLiveMode()) void liveRateMeal(week, mealId, { ...stats, count: 1 }, txn);
     return txn;
   }
 
@@ -65,11 +125,19 @@ export function buildApi(
     };
     const txn: RewardTxn = { id: 'rx-' + hashId('comp' + Date.now()), kind: 'discipline', points: TAIL.comp, label: 'reward.ticket', at: Date.now(), meta: 'reward.meta.pending' };
     commit({ ...db, complaints: [complaint, ...db.complaints], rewards: award(db.rewards, txn) });
+
+    // LIVE: insert the ticket (author uuid = signed-in profile) + its reward.
+    if (isLiveMode()) void liveAddComplaint(complaint, txn);
     return complaint;
   }
 
   function upvoteComplaint(id: string) {
     commit({ ...db, complaints: db.complaints.map((c) => (c.id === id ? { ...c, votes: c.votes + 1 } : c)) });
+    // LIVE: push the incremented vote count for that ticket.
+    if (isLiveMode()) {
+      const next = db.complaints.find((c) => c.id === id);
+      if (next) void liveUpvoteComplaint(id, next.votes + 1);
+    }
   }
 
   function votePoll(optionId: string) {
@@ -108,6 +176,9 @@ export function buildApi(
       })
     }));
     commit({ ...db, week });
+
+    // LIVE: persist items + menu_meta for every day sharing this mock id.
+    if (isLiveMode()) void liveUpdateMenuItem(week, mealId);
   }
 
   /**
@@ -121,6 +192,9 @@ export function buildApi(
       meals: day.meals.map((m) => (m.id === mealId ? { ...m, status } : m))
     }));
     commit({ ...db, week });
+
+    // LIVE: persist the new slot status to meal_plans.
+    if (isLiveMode()) void liveSetMealStatus(week, mealId);
   }
 
   function scratchGift(): { perk: PerkInline; points: number } | null {
@@ -141,7 +215,11 @@ export function buildApi(
   function claimPerk(perkId: string) {
     const perk = PERK_LIST.find((p) => p.id === perkId);
     if (!perk) return;
-    commit({ ...db, wallet: { ...db.wallet, redeemedRewards: db.wallet.redeemedRewards + (perk.costCredits || 0) } });
+    const wallet = { ...db.wallet, redeemedRewards: db.wallet.redeemedRewards + (perk.costCredits || 0) };
+    commit({ ...db, wallet });
+
+    // LIVE: persist wallet.redeemed for this student.
+    if (isLiveMode()) void liveClaimPerk(wallet);
   }
 
   function markRead() {
@@ -181,11 +259,17 @@ export function buildApi(
       : db.notifications;
 
     commit({ ...db, complaints, notifications });
+
+    // LIVE: persist the ticket's workflow fields (notification stays local).
+    if (isLiveMode() && moved) void liveSetComplaintStatus(moved);
   }
 
   function broadcast(points: number, label: string) {
     const txn: RewardTxn = { id: 'rx-' + hashId('bc' + Date.now()), kind: 'discipline', points, label, at: Date.now(), meta: 'reward.meta.broadcast' };
     commit({ ...db, rewards: award(db.rewards, txn) });
+
+    // LIVE: one rewards row (RLS: admin/management sessions only).
+    if (isLiveMode()) void liveBroadcast(txn);
   }
 
   function adjustPoll(optionId: string, delta: number) {
@@ -218,6 +302,9 @@ export function buildApi(
       bookings: [booking, ...db.bookings],
       beds: db.beds.map((candidate) => candidate.id === bed.id ? { ...candidate, status: 'Locked' } : candidate)
     });
+
+    // LIVE: insert the Held booking, then lock the bed.
+    if (isLiveMode()) void liveBookToken(booking);
     return booking;
   }
 
@@ -230,6 +317,9 @@ export function buildApi(
       bookings: db.bookings.map((candidate) => candidate.id === bookingId ? nextBooking : candidate),
       beds: db.beds.map((bed) => bed.id === booking.bedId ? { ...bed, status: 'Booked' as const } : bed)
     });
+
+    // LIVE: booking → Confirmed and bed → Booked.
+    if (isLiveMode()) void liveConfirmArrival(nextBooking);
     return nextBooking;
   }
 
@@ -283,6 +373,9 @@ export function buildApi(
       ]
     };
     commit({ ...db, invoices: [invoice, ...db.invoices] });
+
+    // LIVE: fee desk inserts the bill (staff RLS after role sync).
+    if (isLiveMode()) void liveBuildInvoice(invoice);
     return invoice;
   }
 
@@ -291,6 +384,9 @@ export function buildApi(
     if (!invoice) return null;
     const next = { ...invoice, paid: true };
     commit({ ...db, invoices: db.invoices.map((candidate) => candidate.id === invoiceId ? next : candidate) });
+
+    // LIVE: flip paid (own bill as student, any bill as the fee desk).
+    if (isLiveMode()) void liveMarkInvoicePaid(invoiceId);
     return next;
   }
 
@@ -304,6 +400,9 @@ export function buildApi(
       createdAt: Date.now()
     };
     commit({ ...db, owners: [owner, ...db.owners] });
+
+    // LIVE: owner KYC row (public insert policy — /onboard is signed out).
+    if (isLiveMode()) void liveRegisterOwner(owner);
     return owner;
   }
 
@@ -314,11 +413,20 @@ export function buildApi(
       rating: 4.0, reviews: 0, photos: b.photos ?? [], createdAt: Date.now()
     };
     commit({ ...db, branches: [branch, ...db.branches] });
+
+    // LIVE: listing row (public insert — onboarding funnel / admin console).
+    if (isLiveMode()) void liveRegisterBranch(branch);
     return branch;
   }
 
   function toggleSponsor(branchId: string) {
     commit({ ...db, branches: db.branches.map((b) => (b.id === branchId ? { ...b, sponsored: !b.sponsored } : b)) });
+
+    // LIVE: flip the sponsor flag (staff RLS — admin/management after sync).
+    if (isLiveMode()) {
+      const target = db.branches.find((b) => b.id === branchId);
+      if (target) void liveToggleSponsor(branchId, !target.sponsored);
+    }
   }
 
   /* ----- Applications & verification ----- */
@@ -338,6 +446,9 @@ export function buildApi(
       meta: { name: a.studentName }
     }, ...db.notifications].slice(0, 20);
     commit({ ...db, applications: [app, ...db.applications], notifications });
+
+    // LIVE: applications insert keyed by the student's own roll number.
+    if (isLiveMode()) void liveApplyForHostel(app);
     return app;
   }
 
@@ -347,6 +458,9 @@ export function buildApi(
       applications: db.applications.map((a) => (a.id === id ? { ...a, status, bedId: bedId ?? a.bedId, decidedAt: Date.now() } : a)),
       beds: bedId ? db.beds.map((b) => (b.id === bedId ? { ...b, status: status === 'Approved' ? 'Locked' as BedStatus : b.status } : b)) : db.beds
     });
+
+    // LIVE: desk decision + conditional bed lock (mirrors the local math).
+    if (isLiveMode()) void liveDecideApplication(id, status, bedId ?? null);
   }
 
   function onboardWalkIn(input: { studentName: string; studentId: string; branchId: string; roomNo: string; bedNo: number; monthlyFee: number }): RoomBed {
@@ -363,6 +477,9 @@ export function buildApi(
       bedId: bed.id, status: 'Approved', createdAt: Date.now(), decidedAt: Date.now()
     };
     commit({ ...db, beds: [bed, ...db.beds.filter((b) => b.id !== bed.id)], applications: [app, ...db.applications] });
+
+    // LIVE: bed upsert + approved application (desk RLS; FK order matters).
+    if (isLiveMode()) void liveOnboardWalkIn(bed, app);
     return bed;
   }
 
@@ -383,6 +500,9 @@ export function buildApi(
       code: Array.from({ length: 6 }, () => 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 31)]).join('')
     };
     commit({ ...db, gatepasses: [gp, ...db.gatepasses] });
+
+    // LIVE: pass insert (own roll number as student / desk walk-in).
+    if (isLiveMode()) void liveRequestGatePass(gp);
     return gp;
   }
 
@@ -395,6 +515,17 @@ export function buildApi(
           : g
       )
     });
+
+    // LIVE: persist the transition (desk RLS; students can't forge Approved).
+    if (isLiveMode()) {
+      const current = db.gatepasses.find((g) => g.id === id);
+      if (current) {
+        void liveSetGatePassStatus(
+          id, status,
+          status === 'Returned' ? Date.now() : current.actualReturn ?? null
+        );
+      }
+    }
   }
 
   /**
@@ -407,6 +538,9 @@ export function buildApi(
     if (!bed || bed.status === 'Booked') return null;
     const beds = db.beds.map((b) => (b.id === bedId ? { ...b, status } : b));
     commit({ ...db, beds });
+
+    // LIVE: bed matrix edit (desk RLS — the local guard already ran above).
+    if (isLiveMode()) void liveSetBedStatus(bedId, status);
     return { ...bed, status };
   }
 
