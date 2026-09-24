@@ -173,6 +173,7 @@ export const hinglish = {
   'footer.contactLine': 'Hostel operations, support aur onboarding ke liye available.',
   'footer.docs': 'Help & FAQs',
   'footer.privacy': 'Privacy',
+  'footer.terms': 'Terms',
   'footer.backToTop': 'Upar jao',
 
   /* ---------- Landing ---------- */

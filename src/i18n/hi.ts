@@ -173,6 +173,7 @@ export const hi = {
   'footer.contactLine': 'हॉस्टल संचालन, सपोर्ट और ऑनबोर्डिंग के लिए उपलब्ध।',
   'footer.docs': 'सहायता और प्रश्न',
   'footer.privacy': 'गोपनीयता',
+  'footer.terms': 'नियम व शर्तें',
   'footer.backToTop': 'ऊपर जाएँ',
 
   /* ---------- लैंडिंग ---------- */

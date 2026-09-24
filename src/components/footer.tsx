@@ -23,7 +23,8 @@ const PLATFORM_LINKS: { href: string; key: TKey }[] = [
 const LEARNING_LINKS: { href: string; key: TKey }[] = [
   { href: '/#platform', key: 'footer.docs' },
   { href: '/#features', key: 'footer.ecoGuide' },
-  { href: '/#portals', key: 'footer.privacy' }
+  { href: '/privacy', key: 'footer.privacy' },
+  { href: '/terms', key: 'footer.terms' }
 ];
 
 export function Footer() {

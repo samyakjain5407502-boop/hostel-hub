@@ -17,6 +17,7 @@
  *   • no provider configured → 503 { error: 'sms_not_configured', missing: [...] }
  *   • provider rejected      → 502 { error: 'sms_provider_error', ... }
  *   • malformed request      → 400 { error: 'invalid_request' }
+ *   • rate limited           → 429 { error: 'rate_limited', retryAfterSeconds: n }
  * The UI turns any non-2xx into the friendly `auth.otp.gatewayFail` toast.
  */
 
@@ -24,6 +25,7 @@ import { NextResponse } from 'next/server';
 
 import { isLiveMode } from '@/lib/data-mode';
 import { OTP_TTL_MS } from '@/lib/otp';
+import { checkOtpSendRateLimit, getClientIp } from '@/lib/otp-rate-limit';
 import { sendSms } from '@/lib/sms';
 import { otpServer, isDigits, normalizeMobile } from '../_store';
 
@@ -45,6 +47,18 @@ export async function POST(request: Request) {
 
   if (!challengeId || !isDigits(mobile, 10)) {
     return NextResponse.json({ error: 'invalid_request' }, { status: 400 });
+  }
+
+  /* Server-side rate limit — live mode only (the mock guard above returns
+     before this). Enforces the 30 s per-number cooldown (reusing
+     OTP_RESEND_COOLDOWN_MS), 5 sends/number/hour and 10 requests/IP/hour.
+     A hit is always a clean 429 with a retry hint, never a crash. */
+  const rate = checkOtpSendRateLimit(mobile, getClientIp(request));
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'rate_limited', retryAfterSeconds: rate.retryAfterSeconds },
+      { status: 429, headers: { 'Retry-After': String(rate.retryAfterSeconds) } }
+    );
   }
 
   /* Mint the code server-side and open a fresh challenge. The plaintext

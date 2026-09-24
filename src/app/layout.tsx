@@ -1,8 +1,24 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import { AppProviders } from './providers';
 import './globals.css';
 
+/**
+ * Self-hosted Inter via next/font (no <link>/CDN — faster and needs no extra
+ * CSP allowances). The `variable` option defines `--font-inter` globally,
+ * which is the CSS variable tailwind.config.js references for `font-sans`
+ * and `font-display`, so the whole site now renders in Inter instead of the
+ * system fallback.
+ */
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin']
+});
+
 export const metadata: Metadata = {
+  /* Absolute base so og:image / twitter:image resolve to the production
+     origin instead of http://localhost:3000 when links are shared. */
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://hostel-hub-9py0.onrender.com'),
   title: {
     default: 'HostelHub — Smarter Hostel Living',
     template: '%s · HostelHub'
@@ -16,7 +32,12 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'HostelHub',
     description: 'One Platform, Smarter Hostel Living',
-    siteName: 'HostelHub'
+    siteName: 'HostelHub',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/og-image.png']
   }
 };
 
@@ -28,7 +49,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#4f46e5" />
         <script

@@ -173,6 +173,7 @@ export const en = {
   'footer.contactLine': 'Available for hostel operations, support and onboarding.',
   'footer.docs': 'Help & FAQs',
   'footer.privacy': 'Privacy',
+  'footer.terms': 'Terms',
   'footer.backToTop': 'Back to top',
 
   /* ---------- Landing ---------- */
