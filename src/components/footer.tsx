@@ -1,8 +1,14 @@
 'use client';
 
 import { ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
 import { LogoMark } from '@/components/brand';
 import { useLang, type TKey } from '@/i18n';
+import { getClientSession } from '@/lib/client-session';
+import { PORTAL_HOME } from '@/lib/portals';
+import { useToast } from '@/components/ui/toast';
+import type { Role } from '@/types';
 
 /**
  * Global footer.
@@ -11,6 +17,12 @@ import { useLang, type TKey } from '@/i18n';
  * every column heading uses the identical 11px uppercase treatment.
  * Ownership is stated once, plainly — Medi-Caps University | Cause ’26 — with the
  * two contact details that actually reach a human.
+ *
+ * The three Platform links point at student-only screens. An anonymous visitor
+ * would be bounced by the middleware with no explanation, so `onPlatformClick`
+ * sends them to `/auth/student?redirect=<path>` instead and says out loud that
+ * the demo login is a single click. Signed-in staff are routed to their own
+ * portal home rather than into a role they cannot open.
  */
 const CONTACT = { email: 'Samyakthora@gmail.com', phone: '+91 9098088466', tel: '+919098088466' };
 
@@ -21,14 +33,58 @@ const PLATFORM_LINKS: { href: string; key: TKey }[] = [
 ];
 
 const LEARNING_LINKS: { href: string; key: TKey }[] = [
-  { href: '/#platform', key: 'footer.docs' },
+  { href: '/#faq', key: 'footer.docs' },
   { href: '/#features', key: 'footer.ecoGuide' },
   { href: '/privacy', key: 'footer.privacy' },
   { href: '/terms', key: 'footer.terms' }
 ];
 
+/** Where a Platform link should actually go for the current visitor. */
+function targetFor(role: Role | null, path: string): string {
+  if (!role) return `/auth/student?redirect=${encodeURIComponent(path)}`;
+  return role === 'student' ? path : PORTAL_HOME[role];
+}
+
 export function Footer() {
   const { t } = useLang();
+  const router = useRouter();
+  const toast = useToast();
+  /* `null` = still resolving (server render + first paint). */
+  const [role, setRole] = React.useState<Role | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    getClientSession()
+      .then((session) => {
+        if (!cancelled) setRole(session?.role ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setRole(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /**
+   * Keep the real `href` on the anchor (right-click / middle-click / "open in
+   * new tab" still work), but intercept a plain left click so the friendly
+   * notification survives the navigation.
+   */
+  function onPlatformClick(event: React.MouseEvent<HTMLAnchorElement>, path: string) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    if (!role) {
+      toast.push({
+        title: t('footer.demoNotice.title'),
+        body: t('footer.demoNotice.body'),
+        tone: 'info'
+      });
+    }
+    event.preventDefault();
+    router.push(targetFor(role, path));
+  }
 
   return (
     <footer className="w-full max-w-full overflow-x-clip border-t border-slate-200 bg-slate-50">
@@ -55,7 +111,11 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               {PLATFORM_LINKS.map(({ href, key }) => (
                 <li key={href}>
-                  <a href={href} className="text-sm font-medium text-slate-700 transition-colors hover:text-brand-700">
+                  <a
+                    href={targetFor(role, href)}
+                    onClick={(event) => onPlatformClick(event, href)}
+                    className="text-sm font-medium text-slate-700 transition-colors hover:text-brand-700"
+                  >
                     {t(key)}
                   </a>
                 </li>

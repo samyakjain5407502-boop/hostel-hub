@@ -23,7 +23,9 @@ export function HowItWorks() {
   const { t } = useLang();
 
   return (
-    <section id="platform" className="scroll-mt-24 border-t border-slate-200 bg-white">
+    /* Canonical anchor: `#how-it-works` (the navbar "How it works" link and the
+       footer deep links both resolve here; `#platform` was the old id). */
+    <section id="how-it-works" className="scroll-mt-24 border-t border-slate-200 bg-white">
       <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 sm:py-24">
         <header className="grid gap-5 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-6">

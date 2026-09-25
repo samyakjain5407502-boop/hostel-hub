@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CalendarDays, ChevronLeft, ChevronRight, UtensilsCrossed, Vote } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Radio, UtensilsCrossed, Vote } from 'lucide-react';
 import * as React from 'react';
 import { Card, CardHeader } from '@/components/ui/card';
 import { MealCard } from '@/components/portal/meal-card';
@@ -9,7 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { useDb } from '@/lib/store';
 import { useLang } from '@/i18n';
 import { TODAY_KEY } from '@/lib/data/seed-meals';
-import { cn } from '@/lib/utils';
+import { MESS_CAPACITY } from '@/lib/meal-live';
+import { projectedSaving } from '@/lib/data/ingredients';
+import { cn, formatNum } from '@/lib/utils';
 
 export default function MessPage() {
   const db = useDb();
@@ -18,12 +20,37 @@ export default function MessPage() {
   const week = db.week;
   const day = week[Math.min(dayIdx, week.length - 1)];
 
+  /**
+   * Live kitchen read-out (Phase 4).
+   * Same number the mess operator console shows, because both read it from the
+   * shared store and the same `projectedSaving()` helper — the student sees the
+   * consequence of their own opt-out immediately.
+   */
+  const focus = day.meals.find((m) => m.status === 'active') ?? day.meals[0];
+  const saving = projectedSaving(focus.slot, focus.participating, MESS_CAPACITY);
+
   return (
     <div>
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <h1 className="text-2xl font-extrabold text-slate-900">{render(week[0].date)} · {t('meals.title')}</h1>
         <p className="mt-1 text-slate-500">{t('meals.optOutDone')}</p>
       </motion.div>
+
+      {/* Live link to the mess operator console. */}
+      <div className="mt-4 flex w-full max-w-full items-center gap-3 rounded-2xl border border-success-200 bg-success-50 px-3.5 py-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-success-600">
+          <Radio className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="break-anywhere text-xs font-bold text-success-800">{t('live.dashboardSync')}</p>
+          <p className="text-[11px] font-semibold text-success-700">
+            {t('live.savings')} · ₹{formatNum(saving.rupees)} · {saving.kg} kg
+          </p>
+        </div>
+        <Badge tone="success" dot glow className="shrink-0">
+          {t('game.liveNow')}
+        </Badge>
+      </div>
 
       {/* Day switcher */}
       <div className="mt-4 flex items-center gap-2 overflow-x-auto no-scrollbar">

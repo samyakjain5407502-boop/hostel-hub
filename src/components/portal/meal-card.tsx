@@ -22,16 +22,22 @@ export function MealCard({ meal, interactive = true }: { meal: Meal; interactive
   const toast = useToast();
   const { t } = useLang();
 
+  /**
+   * Toggling here is what drives the operator console: `db.optMeal()` commits the
+   * new headcount *and* broadcasts it over the live-sync bus (Phase 4), so the
+   * counter pulses and re-costs the kitchen in another tab. The toast repeats
+   * the same facts back to the student.
+   */
   function toggle(choice: 'optin' | 'optout') {
     const txn = db.optMeal(meal.id, choice);
     if (choice === 'optout') {
       toast.push({
         title: t('meals.optOutDone'),
-        body: `+${txn?.points ?? 18} ${t('common.points')} reward`,
+        body: `+${txn?.points ?? 18} ${t('common.points')} · ${t('live.autoAdjusted')}`,
         tone: 'success'
       });
     } else {
-      toast.push({ title: t('meals.optInDone'), tone: 'info' });
+      toast.push({ title: t('meals.optInDone'), body: t('live.headcountSynced'), tone: 'info' });
     }
   }
 

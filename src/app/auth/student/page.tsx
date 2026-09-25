@@ -29,6 +29,19 @@ const OTP_ERROR_KEY: Record<OtpStatus, TKey | null> = {
   locked: 'auth.otp.locked'
 };
 
+/**
+ * Safe `?redirect=` target.
+ * Deep links such as `/auth/student?redirect=/dashboard/rewards` (used by the
+ * footer when an anonymous visitor clicks a student-only screen) are honoured
+ * after a successful login — but only for `/dashboard*` paths, so the parameter
+ * can never be turned into an open redirect.
+ */
+function safeRedirect(): string | null {
+  if (typeof window === 'undefined') return null;
+  const raw = new URLSearchParams(window.location.search).get('redirect');
+  return raw && raw.startsWith('/dashboard') ? raw : null;
+}
+
 export default function StudentAuthPage() {
   const { t } = useLang();
   const toast = useToast();
@@ -43,7 +56,14 @@ export default function StudentAuthPage() {
   const [challenge, setChallenge] = React.useState<OtpChallenge | null>(null);
   const [now, setNow] = React.useState(() => Date.now());
   const [busy, setBusy] = React.useState(false);
+  /** Resolved after mount (never during SSR) so hydration stays deterministic. */
+  const [redirectTo, setRedirectTo] = React.useState<string | null>(null);
   const otpRef = React.useRef<HTMLInputElement>(null);
+
+  /* Deep link in the URL? Surface it and remember it for the post-login hop. */
+  React.useEffect(() => {
+    setRedirectTo(safeRedirect());
+  }, []);
 
   const mockMode = isMockMode();
   const awaitingOtp = challenge !== null;
@@ -111,6 +131,11 @@ export default function StudentAuthPage() {
     }
   }
 
+  /** Land on the deep-linked screen when there is one, otherwise the dashboard. */
+  function goAfterLogin() {
+    window.location.href = safeRedirect() ?? '/dashboard';
+  }
+
   async function submit(demo = false) {
     setBusy(true);
     try {
@@ -119,7 +144,7 @@ export default function StudentAuthPage() {
           addPendingCollege(college.name, 'demo');
         }
         await clientLogin(demoStudentUser(college));
-        window.location.href = '/dashboard';
+        goAfterLogin();
         return;
       }
 
@@ -185,7 +210,7 @@ export default function StudentAuthPage() {
       console.info('[hostelhub] student login request', { ...loginRequest, password: '••••••' });
 
       await clientLogin(demoStudentUser(college, loginRequest.mobile));
-      window.location.href = '/dashboard';
+      goAfterLogin();
     } catch {
       toast.push({ title: t('auth.error.invalid'), tone: 'warning' });
     } finally {
@@ -213,6 +238,14 @@ export default function StudentAuthPage() {
       >
         <h1 className="text-xl font-extrabold text-slate-900">{t('auth.student.title')}</h1>
         <p className="mt-1 text-sm text-slate-500">{t('auth.student.sub')}</p>
+
+        {/* Deep link from the footer — tell the visitor where they are headed
+            and that the demo button gets them there in one click. */}
+        {redirectTo && (
+          <p className="mt-3 w-full max-w-full break-anywhere rounded-xl border border-brand-200 bg-brand-50 px-3.5 py-2.5 text-xs font-semibold text-brand-800">
+            {t('auth.redirect.hint', { path: redirectTo })}
+          </p>
+        )}
 
         <div className="mt-5 w-full max-w-full space-y-4">
           {/* Select College — sits above the Student ID / email field. */}

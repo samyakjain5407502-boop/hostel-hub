@@ -45,7 +45,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <Ctx.Provider value={{ push }}>
       {children}
-      <div aria-live="polite" role="region" className="fixed bottom-4 right-4 z-[120] flex w-[min(92vw,360px)] flex-col gap-2.5">
+      <div
+        aria-live="polite"
+        role="region"
+        data-toast-stack=""
+        className="fixed bottom-4 right-4 z-[120] flex w-[min(92vw,360px)] flex-col gap-2.5"
+      >
         <AnimatePresence>
           {toasts.map((t) => {
             const Icon = ICONS[t.tone];

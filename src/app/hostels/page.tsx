@@ -5,18 +5,28 @@ import * as React from 'react';
 import { Footer } from '@/components/footer';
 import { LandingNav } from '@/components/landing/nav';
 import { HostelCard, type BranchStats } from '@/components/market/hostel-card';
+import {
+  BookingModal,
+  GRACE_DAYS,
+  TOKEN_AMOUNT,
+  type BookingDraft,
+  type BookingIntent
+} from '@/components/market/booking-modal';
 import { DirectoryFilters, useHostelFilters } from '@/components/market/filters';
 import { useDb } from '@/lib/store';
 import { useLang } from '@/i18n';
 import { useToast } from '@/components/ui/toast';
-import type { Branch } from '@/types';
+import type { Branch, TokenBooking } from '@/types';
 
 export default function HostelDirectoryPage() {
   const db = useDb();
   const toast = useToast();
   const { t } = useLang();
   const { query, setQuery, gender, setGender, food, setFood, bed, setBed, budget, setBudget, filtered } = useHostelFilters(db.branches);
-  const [pending, setPending] = React.useState<string | null>(null);
+
+  /** Which branch's booking modal is open, and the reservation once confirmed. */
+  const [bookingBranchId, setBookingBranchId] = React.useState<string | null>(null);
+  const [confirmed, setConfirmed] = React.useState<TokenBooking | null>(null);
 
   /** Bed availability + entry-level fee, derived once per branch. */
   const statsFor = React.useCallback(
@@ -31,37 +41,95 @@ export default function HostelDirectoryPage() {
     [db.beds]
   );
 
+  /**
+   * The reservation being drafted, rebuilt from the live store on every render.
+   * Before confirming this is the next Vacant bed; afterwards it is the bed the
+   * token is actually holding — so the modal keeps showing real data (and the
+   * reduced vacancy count) while the confirmation card is on screen.
+   */
+  const draft = React.useMemo<BookingDraft | null>(() => {
+    const branch = db.branches.find((b) => b.id === bookingBranchId);
+    if (!branch) return null;
+    const bed =
+      (confirmed ? db.beds.find((b) => b.id === confirmed.bedId) : undefined) ??
+      db.beds.find((b) => b.branchId === branch.id && b.status === 'Vacant');
+    if (!bed) return null;
+    const stats = statsFor(branch);
+    return { branch, bed, vacant: stats.vacant, total: stats.total, fromFee: stats.fromFee };
+  }, [bookingBranchId, confirmed, db.branches, db.beds, statsFor]);
+
   /** Sponsored placements float to the top — that is what the paid toggle buys. */
   const ordered = React.useMemo(
     () => [...filtered].sort((a, b) => Number(b.sponsored) - Number(a.sponsored)),
     [filtered]
   );
 
-  function book(branch: Branch) {
+  /** "Book with ₹2,000 token" — opens the modal (no more one-click booking). */
+  function openBooking(branch: Branch) {
     const vacantBed = db.beds.find((b) => b.branchId === branch.id && b.status === 'Vacant');
     if (!vacantBed) {
       toast.push({ title: t('admissions.noBed'), tone: 'warning' });
       return;
     }
-    setPending(branch.id);
+    setConfirmed(null);
+    setBookingBranchId(branch.id);
+  }
+
+  /**
+   * Commit the reservation.
+   * Two records, on purpose:
+   *   1. `bookToken()` holds the bed (Vacant → Locked) — this is what reduces
+   *      the "beds open" counter the card shows;
+   *   2. `applyForHostel()` queues the walk-in so the management desk can see
+   *      who is arriving and against which bed.
+   */
+  function handleConfirm(intent: BookingIntent): TokenBooking | null {
+    const branch = db.branches.find((b) => b.id === bookingBranchId);
+    const vacantBed = db.beds.find((b) => b.branchId === bookingBranchId && b.status === 'Vacant');
+    if (!branch || !vacantBed) return null;
+
+    const arrivalAt = intent.moveInDate
+      ? new Date(`${intent.moveInDate}T00:00:00`).getTime()
+      : Date.now() + GRACE_DAYS * 86_400_000;
+
     const booking = db.bookToken({
       applicationId: 'APP-WALKIN',
       branchId: branch.id,
       bedId: vacantBed.id,
-      tokenAmount: 2000,
-      graceDays: 7,
-      expectedArrival: Date.now() + 7 * 86_400_000
+      tokenAmount: TOKEN_AMOUNT,
+      graceDays: GRACE_DAYS,
+      expectedArrival: arrivalAt,
+      reference: intent.reference,
+      studentName: intent.studentName,
+      studentMobile: intent.studentMobile,
+      studentRoll: intent.studentRoll,
+      collegeName: intent.collegeName,
+      dietary: intent.diet,
+      payment: intent.payment
     });
-    setPending(null);
-    if (!booking) {
-      toast.push({ title: t('admissions.noBed'), tone: 'warning' });
-      return;
-    }
+    if (!booking) return null;
+
+    db.applyForHostel({
+      studentName: intent.studentName,
+      studentId: intent.studentRoll,
+      aadhaarLast4: '0000',
+      verified: false,
+      branchId: branch.id,
+      bedId: vacantBed.id
+    });
+
+    setConfirmed(booking);
     toast.push({
       title: t('market.tokenDone'),
       body: t('market.tokenNote', { days: booking.graceDays }),
       tone: 'success'
     });
+    return booking;
+  }
+
+  function closeBooking() {
+    setBookingBranchId(null);
+    setConfirmed(null);
   }
 
   return (
@@ -99,8 +167,8 @@ export default function HostelDirectoryPage() {
                 key={branch.id}
                 branch={branch}
                 stats={statsFor(branch)}
-                onBook={book}
-                booking={pending === branch.id}
+                onBook={openBooking}
+                booking={false}
               />
             ))}
           </div>
@@ -108,9 +176,20 @@ export default function HostelDirectoryPage() {
 
         <p className="mt-8 flex items-start gap-2 rounded-2xl bg-white/70 px-4 py-3 text-xs text-slate-500">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success-600" aria-hidden="true" />
-          {t('market.tokenNote', { days: 7 })}
+          {t('market.tokenNote', { days: GRACE_DAYS })}
         </p>
       </main>
+
+      <BookingModal
+        open={bookingBranchId !== null}
+        draft={draft}
+        confirmed={confirmed}
+        onClose={closeBooking}
+        onConfirm={handleConfirm}
+        onOpenPortal={() => {
+          window.location.href = '/auth/student';
+        }}
+      />
 
       <Footer />
     </div>

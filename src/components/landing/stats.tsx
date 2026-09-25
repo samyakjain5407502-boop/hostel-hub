@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrendingUp } from 'lucide-react';
+import { Coins, Flame, Gift, TrendingUp, type LucideIcon } from 'lucide-react';
 import { useLang, type TKey } from '@/i18n';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -11,6 +11,18 @@ const STATS: [string, TKey][] = [
   ['+1.2k', 'landing.stats.l2'],
   ['98%', 'landing.stats.l3'],
   ['3', 'landing.stats.l4']
+];
+
+/**
+ * The gamified reward loop shown under the ledger.
+ * Three mechanics, in the order a student meets them: an action, the streak it
+ * feeds, and what the points actually buy. This is what `/#rewards` scrolls to,
+ * so the anchor never lands on a row of numbers with no explanation.
+ */
+const MECHANICS: { icon: LucideIcon; key: TKey }[] = [
+  { icon: Coins, key: 'landing.rewards.mech1' },
+  { icon: Flame, key: 'landing.rewards.mech2' },
+  { icon: Gift, key: 'landing.rewards.mech3' }
 ];
 
 /**
@@ -57,6 +69,26 @@ export function ImpactBand() {
                 </motion.div>
               ))}
             </dl>
+
+            {/* ── Streak & points mechanics ─────────────────────────── */}
+            <p className="mt-12 text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+              {t('landing.rewards.mechTitle')}
+            </p>
+            <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+              {MECHANICS.map(({ icon: Icon, key }, i) => (
+                <motion.li
+                  key={key}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.4, delay: i * 0.06, ease: EASE }}
+                  className="flex items-center gap-2.5 rounded-2xl bg-white/10 px-3.5 py-3 ring-1 ring-inset ring-white/15"
+                >
+                  <Icon className="h-4 w-4 shrink-0 text-violet-200" aria-hidden="true" />
+                  <span className="text-xs font-semibold text-white/90">{t(key)}</span>
+                </motion.li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

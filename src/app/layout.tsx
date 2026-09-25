@@ -26,7 +26,28 @@ export const metadata: Metadata = {
   description:
     'One Platform, Smarter Hostel Living. Dynamic mess planning, eco & discipline rewards, complaint tracking and admin analytics for any private hostel or PG network.',
   applicationName: 'HostelHub',
-  icons: { icon: '/icon.svg' },
+  /**
+   * Icons.
+   * `/favicon.ico` is emitted for the legacy browser + crawler request (Next
+   * serves it straight from `public/`), and the scalable `/icon.svg` stays
+   * first-class for modern browsers and the PWA manifest. `apple` covers iOS
+   * "Add to Home Screen".
+   */
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/icon.svg', type: 'image/svg+xml' }
+    ],
+    shortcut: ['/favicon.ico'],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
+  },
+  /* PWA (Phase 3): manifest + iOS standalone hints. */
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    title: 'HostelHub',
+    statusBarStyle: 'default'
+  },
   keywords: ['hostel', 'mess', 'rewards', 'student portal', 'hostel management', 'PG network'],
   openGraph: {
     type: 'website',
@@ -49,7 +70,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#4f46e5" />
         <script

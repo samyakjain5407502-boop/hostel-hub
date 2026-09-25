@@ -6,6 +6,7 @@ import type {
 } from '@/types';
 import { hashId } from '@/lib/utils';
 import { isLiveMode } from './data-mode';
+import { emitMealActivity } from './meal-live';
 import {
   hydrateFromLive as hydratePhase4,
   liveAddComplaint,
@@ -82,6 +83,21 @@ export function buildApi(
       commit({ ...db, week, wallet: { ...db.wallet, onMeal: Math.max(0, db.wallet.onMeal - 5) }, rewards: award(db.rewards, txn) });
     } else {
       commit({ ...db, week, wallet: { ...db.wallet, onMeal: db.wallet.onMeal + 5 } });
+    }
+
+    /* Live sync (Phase 4): broadcast the new headcount + the re-estimated
+       ingredient saving so the mess counter can pulse, log the activity and
+       re-cost the kitchen the moment the student taps a button. */
+    const updated = week.flatMap((day) => day.meals).find((m) => m.id === mealId);
+    if (updated) {
+      emitMealActivity({
+        mealId: updated.id,
+        mealLabel: updated.label,
+        slot: updated.slot,
+        choice,
+        participating: updated.participating,
+        optedOut: updated.optedOut
+      });
     }
 
     // LIVE: mirror this choice to Supabase — meal_plans head-counts, this

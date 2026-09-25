@@ -2,15 +2,19 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { RewardTxn } from '@/types';
-import { load, persist, defaultSnapshot, type DbSnapshot } from './store-core';
+import { load, persist, defaultSnapshot, LS, type DbSnapshot } from './store-core';
 import { buildApi, hydrateFromLive } from './store-api';
 import { isLiveMode } from './data-mode';
+import { publish, subscribe, subscribeStorage } from './live-sync';
 
 export type DbApi = ReturnType<typeof buildApi>;
 export type { PerkInline } from './store-api';
 export { TAIL } from './store-core';
 
 const Ctx = createContext<DbApi | null>(null);
+
+/** Live-sync channel carrying the whole demo snapshot between tabs (Phase 4). */
+const DB_CHANNEL = 'db';
 
 export function DbProvider({ children }: { children: ReactNode }) {
   const [db, setDb] = useState<DbSnapshot>(defaultSnapshot);
@@ -41,9 +45,34 @@ export function DbProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, []);
 
+  /**
+   * Cross-tab sync (Phase 4, demo mode).
+   * The demo is fully client-side, so "the mess console sees the student's
+   * opt-out instantly" means: the second tab picks the snapshot up from
+   * BroadcastChannel, or — on engines without it — straight from localStorage an
+   * instant later via the `storage` event. Both paths are guarded with
+   * `sameSnapshot()` so a remote snapshot can never trigger a render loop.
+   */
+  useEffect(() => {
+    function apply(remote: DbSnapshot) {
+      setDb((current) => (sameSnapshot(current, remote) ? current : remote));
+    }
+    const offChannel = subscribe<DbSnapshot>(DB_CHANNEL, apply, { includeSelf: false });
+    const offStorage = subscribeStorage(LS, () => {
+      const stored = load();
+      setDb((current) => (sameSnapshot(current, stored) ? current : stored));
+    });
+    return () => {
+      offChannel();
+      offStorage();
+    };
+  }, []);
+
   function commit(next: DbSnapshot) {
     setDb(next);
     persist(next);
+    /* Announce it; other tabs apply it, this tab ignores its own echo. */
+    publish(DB_CHANNEL, next);
   }
 
   function award(rewards: RewardTxn[], txn: RewardTxn): RewardTxn[] {

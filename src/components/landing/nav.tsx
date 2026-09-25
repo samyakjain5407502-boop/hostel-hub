@@ -12,11 +12,13 @@ import { PORTAL_UI } from '@/lib/portal-ui';
 /**
  * In-page destinations. Each href is rooted at `/` so the same header works on
  * the landing page *and* on /hostels, /onboard — the anchors resolve from home.
+ * Every target id lives in `src/components/landing/*`: #portals → portals.tsx,
+ * #features → features.tsx, #how-it-works → how.tsx, #rewards → stats.tsx.
  */
 const LINKS = [
   { href: '/#portals', key: 'landing.nav.portals' },
   { href: '/#features', key: 'landing.nav.features' },
-  { href: '/#platform', key: 'landing.nav.how' },
+  { href: '/#how-it-works', key: 'landing.nav.how' },
   { href: '/#rewards', key: 'landing.nav.rewards' }
 ] as const;
 

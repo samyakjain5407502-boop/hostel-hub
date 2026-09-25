@@ -270,6 +270,24 @@ export interface TokenBooking {
   actualArrival?: number | null;
   addonRent: number;
   status: 'Held' | 'Confirmed' | 'Expired';
+
+  /*
+   * Marketplace reservations (Phase 2 booking modal) capture the student's own
+   * details at booking time, because the person paying the token is usually not
+   * in the system yet. All optional so the seeded desk bookings — and the
+   * Supabase `bookings` row mapper, which writes explicit columns only — keep
+   * working untouched. The same details also become a `StudentApplication` so
+   * the admissions desk sees the arrival.
+   */
+  /** Human-facing booking id, e.g. `HH-IND-2026-4821`. */
+  reference?: string;
+  studentName?: string;
+  studentMobile?: string;
+  studentRoll?: string;
+  collegeName?: string;
+  dietary?: FoodTag;
+  /** How the ₹2,000 token is settled. */
+  payment?: 'upi' | 'desk';
 }
 
 export interface PlateSelection {

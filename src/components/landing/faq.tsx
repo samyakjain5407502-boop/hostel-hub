@@ -31,7 +31,10 @@ export function Faq() {
   const duration = reduced ? 0 : 0.3;
 
   return (
-    <section className="bg-slate-50">
+    /* `id="faq"` is the anchor target for the navbar / footer "Help & FAQs"
+       links — `scroll-mt-24` keeps the first question clear of the sticky
+       glass header when the browser jumps here. */
+    <section id="faq" className="scroll-mt-24 bg-slate-50">
       <div className="mx-auto w-full max-w-4xl px-5 py-20 sm:px-6 sm:py-24">
         <header className="mx-auto max-w-2xl text-center">
           <h2 className="text-balance font-display text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">

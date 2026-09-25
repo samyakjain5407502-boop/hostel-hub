@@ -383,6 +383,12 @@ body.scroll-locked {
   word-break: break-word;
 }
 
+/* The PWA install banner owns the bottom edge while it is on screen, so the
+   toast stack steps up out of its way (see components/PwaInstallPrompt.tsx). */
+body.pwa-install-open [data-toast-stack] {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 5.75rem);
+}
+
 /* ---------- Scan-line sweep (mess-operator QR scanner) ---------- */
 @keyframes scan-sweep {
   0% {

@@ -38,10 +38,18 @@ export const PORTAL_BLURB: Record<Role, string> = {
  * Legacy routes kept alive for bookmarks and stale links. The middleware
  * and the page tree both honour these, so an old `/mess-operator` bookmark
  * never dead-ends.
+ *
+ * `next.config.mjs` → `redirects()` owns the canonical aliases and issues the
+ * actual HTTP 307s:
+ *   /operator[/...] → /mess[/...]  ·  /desk[/...] → /management[/...]
+ *   /auth/staff     → /auth
  */
 export const LEGACY_ROUTES: Record<string, string> = {
   '/mess-operator': '/mess',
   '/admin/admissions': '/management/admissions',
-  '/admin/inventory': '/management/inventory'
+  '/admin/inventory': '/management/inventory',
+  '/operator': '/mess',
+  '/desk': '/management',
+  '/auth/staff': '/auth'
 };
 
